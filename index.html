@@ -1,265 +1,561 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Nove Wealth</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>🚀 MAOMAO FINANCE • 19% 24H | 6-Month Lock & Earn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        body {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 20% 30%, #0a0f1e, #010101);
+            padding: 1rem;
+            position: relative;
+        }
 
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0b0e11;
-  color:#eaecef;
-}
+        /* animated grain */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-radial-gradient(circle at 30% 40%, rgba(255,215,0,0.02) 0px, rgba(0,0,0,0.03) 2px, transparent 4px);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-.sidebar{
-  position:fixed;
-  left:0;
-  top:0;
-  width:220px;
-  height:100%;
-  background:#14181f;
-  padding:15px;
-}
+        .app-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
 
-.logo{color:#f0b90b;font-weight:bold;}
+        /* glassmorphic cards */
+        .glass-card {
+            background: rgba(12, 18, 28, 0.7);
+            backdrop-filter: blur(14px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 200, 80, 0.35);
+            padding: 1.5rem;
+            transition: all 0.2s;
+            box-shadow: 0 20px 35px -12px black;
+        }
 
-.main{
-  margin-left:240px;
-  padding:20px;
-}
+        .login-box, .dashboard-main {
+            animation: fadeUp 0.5s ease;
+        }
 
-.card{
-  background:#14181f;
-  border:1px solid #1e2329;
-  padding:15px;
-  margin:10px 0;
-  border-radius:10px;
-}
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
 
-input,button{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  border:none;
-  border-radius:6px;
-}
+        button {
+            background: linear-gradient(95deg, #F5B042, #E2A526);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #0a0c14;
+        }
+        button:active { transform: scale(0.96);}
+        button:disabled { opacity: 0.5; transform: none; cursor: not-allowed;}
 
-button{
-  background:#f0b90b;
-  font-weight:bold;
-  cursor:pointer;
-}
+        input, textarea {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #3e4a5f;
+            padding: 10px 14px;
+            border-radius: 1.2rem;
+            color: white;
+            width: 100%;
+        }
 
-button:hover{background:#d9a400;}
+        .stat-badge {
+            background: #00000066;
+            border-radius: 1rem;
+            padding: 0.8rem;
+        }
 
-.hidden{display:none;}
+        .plan-card {
+            background: linear-gradient(135deg, #1a1f2e, #0e121f);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border-left: 5px solid #F7C948;
+        }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:15px;
-}
-</style>
+        .chat-message {
+            background: #1e2438;
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-radius: 1rem;
+            word-break: break-word;
+        }
+
+        .admin-badge {
+            background: #ff8800;
+            color: black;
+            font-size: 0.7rem;
+            border-radius: 20px;
+            padding: 2px 8px;
+        }
+
+        .money-effect {
+            animation: moneyBlast 0.5s ease-out;
+        }
+        @keyframes moneyBlast {
+            0% { text-shadow: 0 0 0 #ffd966; transform: scale(1);}
+            50% { text-shadow: 0 0 20px #ffaa33; transform: scale(1.05);}
+        }
+    </style>
 </head>
-
 <body>
+<div class="app-container" id="appRoot"></div>
 
-<div class="sidebar">
-<div class="logo">NOVE WEALTH</div>
-<p>Dashboard</p>
-</div>
+<script>
+    // ---------- STORAGE KEYS ----------
+    const STORAGE_USERS = "maua_users";
+    const STORAGE_GLOBAL_MSGS = "maua_global_chat";
+    const DEFAULT_ADMIN = { username: "admin", pin: "1234", role: "admin", balance: 0, deposits: [], withdrawals: [], pendingDeposits: [] };
 
-<div class="main">
+    // ---------- helpers ----------
+    function getUsers() {
+        const raw = localStorage.getItem(STORAGE_USERS);
+        if(!raw) {
+            const initial = [DEFAULT_ADMIN];
+            localStorage.setItem(STORAGE_USERS, JSON.stringify(initial));
+            return initial;
+        }
+        return JSON.parse(raw);
+    }
 
-<!-- AUTH -->
-<div id="auth" class="card">
-<h3>Login</h3>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
+    function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
 
-<button onclick="signup()">Signup</button>
-<button onclick="login()">Login</button>
-</div>
+    function getMessages() {
+        const raw = localStorage.getItem(STORAGE_GLOBAL_MSGS);
+        return raw ? JSON.parse(raw) : [];
+    }
+    function saveMessages(msgs) { localStorage.setItem(STORAGE_GLOBAL_MSGS, JSON.stringify(msgs)); }
 
-<!-- APP -->
-<div id="app" class="hidden">
+    let currentUser = null; // { username, pin, role, balance, deposits, withdrawals, pendingDeposits }
 
-<div class="card">
-<h2>Dashboard</h2>
-<p>Email: <span id="userEmail"></span></p>
-<p>Balance: <b id="balance">0</b> KES</p>
-<button onclick="logout()">Logout</button>
-</div>
+    // helpers: compute matured values for 6m deposits (5% APY compounded monthly over 6 months)
+    function calcMatured6m(principal) {
+        const r = 0.05, n = 12, t = 0.5;
+        return Math.floor(principal * Math.pow((1 + r/n), n*t));
+    }
+    // 24h plan: 19% instant growth but locked 24h (after 24h you can withdraw)
+    function calc24hMatured(principal) { return Math.floor(principal * 1.19); }
 
-<div class="grid">
+    // update user data & persist
+    function updateCurrentUserAndSave(newData) {
+        if(!currentUser) return;
+        const users = getUsers();
+        const idx = users.findIndex(u => u.username === currentUser.username);
+        if(idx !== -1) {
+            users[idx] = { ...newData };
+            currentUser = { ...newData };
+            saveUsers(users);
+        }
+        renderApp();
+    }
 
-<div class="card">
-<h3>Invest</h3>
-<input id="investAmount" type="number" placeholder="Amount">
+    // get unlocked balances (24h deposits where unlock24 <= now, and 6m deposits where unlock6m <= now)
+    function getAvailableBalance(user) {
+        const now = new Date();
+        let unlocked = 0;
+        if(user.deposits) {
+            user.deposits.forEach(dep => {
+                if(dep.type === '24h') {
+                    if(new Date(dep.unlockDate) <= now) unlocked += dep.maturedValue;
+                } else if(dep.type === '6m') {
+                    if(new Date(dep.unlockDate) <= now) unlocked += dep.maturedValue;
+                }
+            });
+        }
+        return unlocked;
+    }
 
-<button onclick="invest()">Invest Now</button>
+    function getTotalBalance(user) {
+        if(!user.deposits) return 0;
+        return user.deposits.reduce((sum, d) => sum + d.maturedValue, 0);
+    }
 
-<p id="paymentInfo"></p>
-</div>
+    function getLockedBalance(user) {
+        const now = new Date();
+        if(!user.deposits) return 0;
+        return user.deposits.reduce((sum, d) => {
+            if(new Date(d.unlockDate) > now) return sum + d.maturedValue;
+            return sum;
+        }, 0);
+    }
 
-<div class="card">
-<h3>Withdraw</h3>
-<input id="wd" type="number">
-<button onclick="withdraw()">Request</button>
-</div>
+    // admin approve pending deposit (simulate M-Pesa)
+    function adminApproveDeposit(username, pendingId) {
+        const users = getUsers();
+        const userIdx = users.findIndex(u => u.username === username);
+        if(userIdx === -1) return false;
+        const user = users[userIdx];
+        const pendingIndex = (user.pendingDeposits || []).findIndex(p => p.id === pendingId);
+        if(pendingIndex === -1) return false;
+        const pending = user.pendingDeposits[pendingIndex];
+        // add real deposit (based on plan selected)
+        const newDeposit = {
+            id: Date.now() + Math.random()*10000,
+            amount: pending.amount,
+            depositDate: new Date().toISOString(),
+            unlockDate: pending.unlockDateISO,
+            maturedValue: pending.maturedValue,
+            type: pending.planType,
+        };
+        if(!user.deposits) user.deposits = [];
+        user.deposits.push(newDeposit);
+        user.pendingDeposits.splice(pendingIndex,1);
+        saveUsers(users);
+        if(currentUser && currentUser.username === username) {
+            currentUser = { ...user };
+            renderApp();
+        }
+        return true;
+    }
 
-<div class="card">
-<h3>Growth Chart</h3>
-<canvas id="chart"></canvas>
-</div>
+    // withdraw logic
+    function processWithdrawal(amountKES) {
+        if(!currentUser) return false;
+        const available = getAvailableBalance(currentUser);
+        if(amountKES < 1500) { alert("Min withdrawal 1,500 KES"); return false; }
+        if(amountKES > 10000) { alert("Max per withdrawal 10,000 KES"); return false; }
+        if(amountKES > available) { alert("Insufficient unlocked balance"); return false; }
 
-</div>
+        let remaining = amountKES;
+        const updatedDeposits = [];
+        for(let dep of currentUser.deposits) {
+            const isUnlocked = new Date(dep.unlockDate) <= new Date();
+            if(isUnlocked && remaining > 0 && dep.maturedValue > 0) {
+                if(dep.maturedValue <= remaining) {
+                    remaining -= dep.maturedValue;
+                    continue;
+                } else {
+                    dep.maturedValue -= remaining;
+                    remaining = 0;
+                    updatedDeposits.push(dep);
+                }
+            } else {
+                updatedDeposits.push(dep);
+            }
+        }
+        if(remaining > 0) return false;
+        const newDeposits = updatedDeposits.filter(d => d.maturedValue > 0);
+        if(!currentUser.withdrawals) currentUser.withdrawals = [];
+        currentUser.withdrawals.push({ amount: amountKES, date: new Date().toISOString() });
+        currentUser.deposits = newDeposits;
+        updateCurrentUserAndSave(currentUser);
+        alert(`✅ Withdrawn ${amountKES.toLocaleString()} KES successfully!`);
+        return true;
+    }
 
-<div class="card">
-<h3>Transactions</h3>
-<div id="tx"></div>
-</div>
+    // create pending deposit (user requests)
+    function requestDeposit(amount, planType) {
+        if(!currentUser) return;
+        if(amount < 1500) { alert("Minimum deposit 1,500 KES"); return; }
+        let maturedValue, unlockDateISO;
+        const nowDate = new Date();
+        if(planType === '24h') {
+            maturedValue = calc24hMatured(amount);
+            const unlock = new Date(nowDate);
+            unlock.setHours(unlock.getHours() + 24);
+            unlockDateISO = unlock.toISOString();
+        } else {
+            maturedValue = calcMatured6m(amount);
+            const unlock = new Date(nowDate);
+            unlock.setMonth(unlock.getMonth() + 6);
+            unlockDateISO = unlock.toISOString();
+        }
+        const pendingId = Date.now() + Math.random();
+        const pendingItem = {
+            id: pendingId,
+            amount: amount,
+            planType: planType,
+            maturedValue: maturedValue,
+            unlockDateISO: unlockDateISO,
+            requestedAt: new Date().toISOString(),
+            phoneNumber: "+254 742 383238"
+        };
+        if(!currentUser.pendingDeposits) currentUser.pendingDeposits = [];
+        currentUser.pendingDeposits.push(pendingItem);
+        updateCurrentUserAndSave(currentUser);
+        alert(`📱 Deposit request sent! Send ${amount} KES to ${pendingItem.phoneNumber} via M-Pesa. Admin will confirm.`);
+        renderApp();
+    }
 
-</div>
+    // global chat
+    function sendGlobalMessage(text) {
+        if(!currentUser) return;
+        if(!text.trim()) return;
+        const msgs = getMessages();
+        msgs.push({
+            user: currentUser.username,
+            text: text.substring(0, 200),
+            timestamp: new Date().toISOString(),
+            role: currentUser.role || "user"
+        });
+        saveMessages(msgs);
+        renderApp();
+    }
 
-</div>
+    // -------- RENDERING (login vs dashboard) ----------
+    function renderApp() {
+        const root = document.getElementById("appRoot");
+        if(!currentUser) {
+            root.innerHTML = renderLoginScreen();
+            attachLoginEvents();
+        } else {
+            root.innerHTML = renderDashboard();
+            attachDashboardEvents();
+            autoScrollChat();
+        }
+    }
 
-<script type="module">
+    function renderLoginScreen() {
+        return `
+            <div class="glass-card login-box" style="max-width:450px; margin:5rem auto; text-align:center;">
+                <h1 style="color:#F7D44A; margin-bottom:1rem;">💰 MAOMAO FINANCE</h1>
+                <p style="margin-bottom:2rem; color:#bbb;">19% in 24h • 6-Month 5% APY</p>
+                <div style="margin:1rem 0;">
+                    <input type="text" id="loginUsername" placeholder="Username" style="margin-bottom:12px;">
+                    <input type="password" id="loginPin" placeholder="PIN (digits)">
+                    <button id="loginBtn" style="margin-top:20px;">🔓 Login / Register</button>
+                </div>
+                <div class="small-info" style="font-size:0.7rem;">New users: just enter new username + PIN → auto register. Admin: admin / 1234</div>
+                <div style="margin-top:20px; font-size:0.7rem;">📞 Deposit M-Pesa: +254 742 383238</div>
+            </div>
+        `;
+    }
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    function attachLoginEvents() {
+        const loginBtn = document.getElementById("loginBtn");
+        if(loginBtn) {
+            loginBtn.onclick = () => {
+                const username = document.getElementById("loginUsername").value.trim();
+                const pin = document.getElementById("loginPin").value.trim();
+                if(!username || !pin) { alert("Enter username & PIN"); return; }
+                let users = getUsers();
+                let user = users.find(u => u.username === username);
+                if(user) {
+                    if(user.pin !== pin) { alert("Wrong PIN"); return; }
+                    currentUser = { ...user };
+                    renderApp();
+                } else {
+                    const newUser = {
+                        username: username,
+                        pin: pin,
+                        role: "user",
+                        balance: 0,
+                        deposits: [],
+                        withdrawals: [],
+                        pendingDeposits: []
+                    };
+                    users.push(newUser);
+                    saveUsers(users);
+                    currentUser = { ...newUser };
+                    renderApp();
+                }
+            };
+        }
+    }
 
-const supabase = createClient(
-"YOUR_SUPABASE_URL",
-"YOUR_SUPABASE_ANON_KEY"
-);
+    function renderDashboard() {
+        if(!currentUser) return "";
+        const isAdmin = currentUser.role === "admin";
+        const availableBal = getAvailableBalance(currentUser);
+        const totalBal = getTotalBalance(currentUser);
+        const lockedBal = getLockedBalance(currentUser);
+        const messages = getMessages();
+        return `
+            <div class="dashboard-main">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+                    <div><h2 style="color:#F7D44A;">👋 ${currentUser.username} ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}</h2></div>
+                    <button id="logoutBtn" style="background:#2c2f3f; color:#ffd966;">🚪 Logout</button>
+                </div>
 
-let user;
+                <!-- stats row -->
+                <div class="stats-grid" style="display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:2rem;">
+                    <div class="glass-card" style="flex:1; text-align:center;"><div>💰 TOTAL BALANCE</div><div style="font-size:2rem;">${totalBal.toLocaleString()} KES</div></div>
+                    <div class="glass-card" style="flex:1; text-align:center;"><div>🔒 LOCKED</div><div style="font-size:2rem;">${lockedBal.toLocaleString()} KES</div></div>
+                    <div class="glass-card" style="flex:1; text-align:center;"><div>✅ AVAILABLE (unlocked)</div><div style="font-size:2rem; color:#9bef8f;">${availableBal.toLocaleString()} KES</div></div>
+                </div>
 
-// ---------------- AUTH ----------------
-window.signup = async ()=>{
-await supabase.auth.signUp({
-email:email.value,
-password:password.value
-});
-alert("Check email");
-};
+                <!-- investment plans -->
+                <div style="display:flex; flex-wrap:wrap; gap:1.5rem; margin-bottom:2rem;">
+                    <div class="plan-card" style="flex:1;">
+                        <h3>⚡ 24H TURBO • 19% RETURN</h3>
+                        <p>Deposit locks for 24h → +19% profit (example: 10,000 KES → 11,900 KES)</p>
+                        <div class="input-group" style="margin:10px 0;"><input type="number" id="turboAmount" placeholder="Min 1,500 KES" min="1500"></div>
+                        <button id="investTurboBtn">🚀 Invest 24H (19%)</button>
+                        <div class="small-info" style="font-size:0.7rem;">📞 Send money to +254 742 383238, admin approves.</div>
+                    </div>
+                    <div class="plan-card" style="flex:1;">
+                        <h3>🏦 6-MONTH LOCK • 5% APY</h3>
+                        <p>Compounded monthly → mature value + interest after 6 months</p>
+                        <div class="input-group" style="margin:10px 0;"><input type="number" id="sixMonthAmount" placeholder="Min 1,500 KES" min="1500"></div>
+                        <button id="investSixBtn">🔒 Lock 6 Months</button>
+                        <div class="small-info">Full amount + interest unlocked after 180 days</div>
+                    </div>
+                </div>
 
-window.login = async ()=>{
-const {data,error} = await supabase.auth.signInWithPassword({
-email:email.value,
-password:password.value
-});
+                <!-- Withdraw section -->
+                <div class="glass-card" style="margin-bottom:2rem;">
+                    <h3>💸 Withdraw Funds (min 1,500 | max 10,000 KES per tx)</h3>
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+                        <input type="number" id="withdrawAmountInput" placeholder="Amount KES" style="flex:2;" min="1500" max="10000">
+                        <button id="withdrawActionBtn">💳 Withdraw</button>
+                    </div>
+                    <div class="small-info">Available unlocked: ${availableBal.toLocaleString()} KES</div>
+                </div>
 
-if(error) return alert(error.message);
+                <!-- Active deposits with timers & crazy effect -->
+                <div class="glass-card" style="margin-bottom:2rem;">
+                    <h3>📈 Your Active Deposits (real-time)</h3>
+                    <div id="activeDepositsList">${renderDepositsList()}</div>
+                </div>
 
-user=data.user;
-init();
-};
+                <!-- ADMIN PANEL: pending deposits -->
+                ${isAdmin ? `<div class="glass-card" style="margin-bottom:2rem; border-color:#ffaa33;">
+                    <h3>👑 ADMIN: Pending M-Pesa Deposits</h3>
+                    <div id="adminPendingList">${renderAdminPending()}</div>
+                </div>` : ''}
 
-window.logout = async ()=>{
-await supabase.auth.signOut();
-location.reload();
-};
+                <!-- GLOBAL CHAT -->
+                <div class="glass-card">
+                    <h3>💬 GLOBAL CHAT • everyone sees messages</h3>
+                    <div id="chatMessages" style="height:200px; overflow-y:auto; background:#03060c80; border-radius:1rem; padding:0.5rem; margin-bottom:10px;">
+                        ${messages.map(m => `<div class="chat-message"><strong>${m.user}</strong> ${m.role==='admin'?'⭐':''}: ${m.text} <span style="font-size:0.6rem; color:#aaa;">${new Date(m.timestamp).toLocaleTimeString()}</span></div>`).join('')}
+                    </div>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input type="text" id="chatInput" placeholder="Type message for everyone..." style="flex:3;">
+                        <button id="sendChatBtn">📢 Send</button>
+                    </div>
+                </div>
+                <div style="margin-top:1rem; font-size:0.7rem; text-align:center;">📱 Deposit phone: +254 742 383238 • admin approves after payment</div>
+            </div>
+        `;
+    }
 
-// ---------------- INIT ----------------
-async function init(){
+    function renderDepositsList() {
+        if(!currentUser.deposits || currentUser.deposits.length === 0) return "<div>✨ No active deposits. Invest now!</div>";
+        const now = new Date();
+        return currentUser.deposits.map(dep => {
+            const unlockDate = new Date(dep.unlockDate);
+            const isUnlocked = unlockDate <= now;
+            let countdown = "";
+            if(!isUnlocked) {
+                const diff = unlockDate - now;
+                if(dep.type === '24h') {
+                    const hoursLeft = Math.max(0, Math.floor(diff / (1000*60*60)));
+                    const minutes = Math.floor((diff % (3600000))/60000);
+                    countdown = `⏳ unlocks in ${hoursLeft}h ${minutes}m`;
+                } else {
+                    const days = Math.floor(diff / (86400000));
+                    countdown = `📅 unlocks in ${days} days`;
+                }
+            } else countdown = "✅ UNLOCKED READY";
+            const interest = dep.maturedValue - dep.amount;
+            return `<div class="stat-badge" style="margin-bottom:8px; display:flex; justify-content:space-between; flex-wrap:wrap;">
+                        <span><strong>${dep.type === '24h' ? '⚡24H 19%' : '🏦6-Month'}</strong> ${dep.amount.toLocaleString()} KES → ${dep.maturedValue.toLocaleString()} KES (+${interest.toLocaleString()})</span>
+                        <span>${countdown}</span>
+                    </div>`;
+        }).join('');
+    }
 
-document.getElementById("auth").classList.add("hidden");
-document.getElementById("app").classList.remove("hidden");
+    function renderAdminPending() {
+        const users = getUsers();
+        let pendingHtml = "";
+        for(let user of users) {
+            if(user.pendingDeposits && user.pendingDeposits.length) {
+                user.pendingDeposits.forEach(pend => {
+                    pendingHtml += `<div style="background:#1e1a2f; margin:8px; padding:8px; border-radius:1rem;">
+                        <strong>${user.username}</strong> | ${pend.planType} | ${pend.amount.toLocaleString()} KES → matured ${pend.maturedValue.toLocaleString()}
+                        <button class="approvePendingBtn" data-user="${user.username}" data-id="${pend.id}">✅ Approve Deposit</button>
+                    </div>`;
+                });
+            }
+        }
+        if(!pendingHtml) return "No pending deposits awaiting confirmation.";
+        return pendingHtml;
+    }
 
-document.getElementById("userEmail").innerText=user.email;
+    function attachDashboardEvents() {
+        document.getElementById("logoutBtn")?.addEventListener("click", () => { currentUser = null; renderApp(); });
+        document.getElementById("investTurboBtn")?.addEventListener("click", () => {
+            const amount = parseFloat(document.getElementById("turboAmount").value);
+            if(!amount || amount<1500) alert("Minimum 1,500 KES");
+            else requestDeposit(amount, "24h");
+        });
+        document.getElementById("investSixBtn")?.addEventListener("click", () => {
+            const amount = parseFloat(document.getElementById("sixMonthAmount").value);
+            if(!amount || amount<1500) alert("Minimum 1,500 KES");
+            else requestDeposit(amount, "6m");
+        });
+        document.getElementById("withdrawActionBtn")?.addEventListener("click", () => {
+            const amt = parseFloat(document.getElementById("withdrawAmountInput").value);
+            if(!amt) alert("Enter amount");
+            else processWithdrawal(amt);
+        });
+        document.getElementById("sendChatBtn")?.addEventListener("click", () => {
+            const input = document.getElementById("chatInput");
+            sendGlobalMessage(input.value);
+            input.value = "";
+        });
+        // admin approve dynamic buttons
+        document.querySelectorAll(".approvePendingBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const username = btn.getAttribute("data-user");
+                const id = parseInt(btn.getAttribute("data-id"));
+                adminApproveDeposit(username, id);
+                renderApp(); // refresh admin view
+            });
+        });
+        // 24h +10% visual effect simulation when requesting? we add "moneyEffect" on click
+        const turboBtn = document.getElementById("investTurboBtn");
+        if(turboBtn) {
+            turboBtn.addEventListener("click", () => {
+                const amountInput = document.getElementById("turboAmount");
+                const val = parseFloat(amountInput?.value);
+                if(val>=1500) {
+                    const effectDiv = document.createElement("div");
+                    effectDiv.className = "money-effect";
+                    effectDiv.innerText = `🔥 +10% SURGE! 19% after 24h! 🔥`;
+                    effectDiv.style.position = "fixed"; effectDiv.style.bottom = "20%"; effectDiv.style.left="20%"; effectDiv.style.background="#ffaa33"; effectDiv.style.padding="12px"; effectDiv.style.borderRadius="30px"; effectDiv.style.zIndex="9999";
+                    document.body.appendChild(effectDiv);
+                    setTimeout(() => effectDiv.remove(), 1500);
+                }
+            });
+        }
+    }
 
-loadChart();
-loadTx();
-}
+    function autoScrollChat() {
+        const chatDiv = document.getElementById("chatMessages");
+        if(chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
 
-// ---------------- INVEST ----------------
-window.invest = async ()=>{
-
-let amount = Number(investAmount.value);
-
-// create investment request
-await supabase.from("transactions").insert([{
-user_id:user.id,
-type:"investment",
-amount:amount,
-status:"pending"
-}]);
-
-// SAFE PAYMENT DISPLAY (NO PERSONAL NUMBER)
-paymentInfo.innerHTML = `
-<b>Deposit Instructions:</b><br>
-Send funds using official verification process.<br>
-Your request ID will be confirmed by admin.<br>
-Do NOT send money without approval.
-`;
-
-alert("Investment request created");
-};
-
-// ---------------- WITHDRAW ----------------
-window.withdraw = async ()=>{
-
-await supabase.from("transactions").insert([{
-user_id:user.id,
-type:"withdraw",
-amount:Number(wd.value),
-status:"pending"
-}]);
-
-};
-
-// ---------------- CHART ----------------
-function loadChart(){
-
-new Chart(document.getElementById("chart"),{
-type:"line",
-data:{
-labels:["Day1","Day2","Day3","Day4","Day5"],
-datasets:[{
-label:"Portfolio Growth",
-data:[1000,1100,1210,1330,1460],
-borderColor:"#f0b90b"
-}]
-}
-});
-
-}
-
-// ---------------- TX ----------------
-async function loadTx(){
-
-let {data}=await supabase
-.from("transactions")
-.select("*")
-.eq("user_id",user.id);
-
-let html="";
-
-data.forEach(t=>{
-html+=`
-<div>
-${t.type} - ${t.amount} KES (${t.status})
-<hr>
-</div>`;
-});
-
-document.getElementById("tx").innerHTML=html;
-}
-
-// ---------------- SESSION ----------------
-supabase.auth.getSession().then(({data})=>{
-if(data.session){
-user=data.session.user;
-init();
-}
-});
-
+    // periodic refresh to update timers (every second)
+    setInterval(() => {
+        if(currentUser) {
+            renderApp();
+        }
+    }, 1000);
+    // initial render
+    renderApp();
 </script>
-
 </body>
   </html>
