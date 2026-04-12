@@ -1,2 +1,2 @@
 # NOVA-WEALTH
-The official Blue Pool Forex Traders command center. An all-in-one SMC trading terminal featuring institutional backtesting labs, live market analysis, and a step-by-step masterclass curriculum led by Blessing Kijana."
+A site that can enable one to invest money ie minimum deposit 1500 and one is able to withdraw a minimum of 10000 after one month. The amount that would be invested would increase by 10% everyday......
