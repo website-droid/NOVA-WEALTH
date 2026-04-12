@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Nove Wealth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b0e11;
+  color:#eaecef;
+}
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  width:220px;
+  height:100%;
+  background:#14181f;
+  padding:15px;
+}
+
+.logo{color:#f0b90b;font-weight:bold;}
+
+.main{
+  margin-left:240px;
+  padding:20px;
+}
+
+.card{
+  background:#14181f;
+  border:1px solid #1e2329;
+  padding:15px;
+  margin:10px 0;
+  border-radius:10px;
+}
+
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border:none;
+  border-radius:6px;
+}
+
+button{
+  background:#f0b90b;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{background:#d9a400;}
+
+.hidden{display:none;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+<div class="logo">NOVE WEALTH</div>
+<p>Dashboard</p>
+</div>
+
+<div class="main">
+
+<!-- AUTH -->
+<div id="auth" class="card">
+<h3>Login</h3>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="signup()">Signup</button>
+<button onclick="login()">Login</button>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+<div class="card">
+<h2>Dashboard</h2>
+<p>Email: <span id="userEmail"></span></p>
+<p>Balance: <b id="balance">0</b> KES</p>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div class="grid">
+
+<div class="card">
+<h3>Invest</h3>
+<input id="investAmount" type="number" placeholder="Amount">
+
+<button onclick="invest()">Invest Now</button>
+
+<p id="paymentInfo"></p>
+</div>
+
+<div class="card">
+<h3>Withdraw</h3>
+<input id="wd" type="number">
+<button onclick="withdraw()">Request</button>
+</div>
+
+<div class="card">
+<h3>Growth Chart</h3>
+<canvas id="chart"></canvas>
+</div>
+
+</div>
+
+<div class="card">
+<h3>Transactions</h3>
+<div id="tx"></div>
+</div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+"YOUR_SUPABASE_URL",
+"YOUR_SUPABASE_ANON_KEY"
+);
+
+let user;
+
+// ---------------- AUTH ----------------
+window.signup = async ()=>{
+await supabase.auth.signUp({
+email:email.value,
+password:password.value
+});
+alert("Check email");
+};
+
+window.login = async ()=>{
+const {data,error} = await supabase.auth.signInWithPassword({
+email:email.value,
+password:password.value
+});
+
+if(error) return alert(error.message);
+
+user=data.user;
+init();
+};
+
+window.logout = async ()=>{
+await supabase.auth.signOut();
+location.reload();
+};
+
+// ---------------- INIT ----------------
+async function init(){
+
+document.getElementById("auth").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+
+document.getElementById("userEmail").innerText=user.email;
+
+loadChart();
+loadTx();
+}
+
+// ---------------- INVEST ----------------
+window.invest = async ()=>{
+
+let amount = Number(investAmount.value);
+
+// create investment request
+await supabase.from("transactions").insert([{
+user_id:user.id,
+type:"investment",
+amount:amount,
+status:"pending"
+}]);
+
+// SAFE PAYMENT DISPLAY (NO PERSONAL NUMBER)
+paymentInfo.innerHTML = `
+<b>Deposit Instructions:</b><br>
+Send funds using official verification process.<br>
+Your request ID will be confirmed by admin.<br>
+Do NOT send money without approval.
+`;
+
+alert("Investment request created");
+};
+
+// ---------------- WITHDRAW ----------------
+window.withdraw = async ()=>{
+
+await supabase.from("transactions").insert([{
+user_id:user.id,
+type:"withdraw",
+amount:Number(wd.value),
+status:"pending"
+}]);
+
+};
+
+// ---------------- CHART ----------------
+function loadChart(){
+
+new Chart(document.getElementById("chart"),{
+type:"line",
+data:{
+labels:["Day1","Day2","Day3","Day4","Day5"],
+datasets:[{
+label:"Portfolio Growth",
+data:[1000,1100,1210,1330,1460],
+borderColor:"#f0b90b"
+}]
+}
+});
+
+}
+
+// ---------------- TX ----------------
+async function loadTx(){
+
+let {data}=await supabase
+.from("transactions")
+.select("*")
+.eq("user_id",user.id);
+
+let html="";
+
+data.forEach(t=>{
+html+=`
+<div>
+${t.type} - ${t.amount} KES (${t.status})
+<hr>
+</div>`;
+});
+
+document.getElementById("tx").innerHTML=html;
+}
+
+// ---------------- SESSION ----------------
+supabase.auth.getSession().then(({data})=>{
+if(data.session){
+user=data.session.user;
+init();
+}
+});
+
+</script>
+
+</body>
+  </html>
