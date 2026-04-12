@@ -3,559 +3,572 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>🚀 MAOMAO FINANCE • 19% 24H | 6-Month Lock & Earn</title>
+    <title>Nove Wealth | Premium Fintech Dashboard</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            min-height: 100vh;
-            background: radial-gradient(ellipse at 20% 30%, #0a0f1e, #010101);
-            padding: 1rem;
-            position: relative;
+            background: #0a0c12;
+            overflow-x: hidden;
         }
 
-        /* animated grain */
-        body::before {
-            content: "";
+        /* Three.js canvas background */
+        #bg-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-radial-gradient(circle at 30% 40%, rgba(255,215,0,0.02) 0px, rgba(0,0,0,0.03) 2px, transparent 4px);
-            pointer-events: none;
             z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
         }
 
-        .app-container {
-            max-width: 1500px;
-            margin: 0 auto;
+        /* main app wrapper */
+        .app-wrapper {
             position: relative;
-            z-index: 2;
+            z-index: 10;
+            display: flex;
+            min-height: 100vh;
         }
 
-        /* glassmorphic cards */
-        .glass-card {
-            background: rgba(12, 18, 28, 0.7);
-            backdrop-filter: blur(14px);
-            border-radius: 2rem;
-            border: 1px solid rgba(255, 200, 80, 0.35);
-            padding: 1.5rem;
-            transition: all 0.2s;
-            box-shadow: 0 20px 35px -12px black;
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2rem 1rem;
+            transition: all 0.3s;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            left: 0;
+            top: 0;
+            z-index: 20;
         }
 
-        .login-box, .dashboard-main {
-            animation: fadeUp 0.5s ease;
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #F0B90B, #FFD966);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 2.5rem;
+            text-align: center;
         }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-
-        button {
-            background: linear-gradient(95deg, #F5B042, #E2A526);
-            border: none;
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 12px 20px;
-            border-radius: 2rem;
-            font-weight: bold;
+            margin: 8px 0;
+            border-radius: 16px;
+            color: #9ca3af;
             cursor: pointer;
             transition: 0.2s;
-            color: #0a0c14;
+            font-weight: 500;
         }
-        button:active { transform: scale(0.96);}
-        button:disabled { opacity: 0.5; transform: none; cursor: not-allowed;}
 
-        input, textarea {
-            background: rgba(0,0,0,0.6);
-            border: 1px solid #3e4a5f;
-            padding: 10px 14px;
-            border-radius: 1.2rem;
+        .nav-item:hover, .nav-item.active {
+            background: rgba(240, 185, 11, 0.15);
+            color: #F0B90B;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        /* cards */
+        .stat-card {
+            background: rgba(18, 22, 35, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .btn-gold {
+            background: linear-gradient(95deg, #F0B90B, #E2A526);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: #0a0c12;
+            cursor: pointer;
+        }
+
+        input, select, textarea {
+            background: #1E2235;
+            border: 1px solid #2d3348;
+            padding: 12px 16px;
+            border-radius: 24px;
             color: white;
             width: 100%;
         }
 
-        .stat-badge {
-            background: #00000066;
-            border-radius: 1rem;
-            padding: 0.8rem;
+        .notification-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e293b;
+            border-left: 4px solid #F0B90B;
+            padding: 12px 20px;
+            border-radius: 16px;
+            z-index: 1000;
+            animation: slideIn 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        .plan-card {
-            background: linear-gradient(135deg, #1a1f2e, #0e121f);
-            border-radius: 1.5rem;
-            padding: 1.2rem;
-            border-left: 5px solid #F7C948;
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        .chat-message {
-            background: #1e2438;
-            margin: 8px 0;
-            padding: 8px 12px;
-            border-radius: 1rem;
-            word-break: break-word;
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 30;
+            background: #F0B90B;
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
         }
 
-        .admin-badge {
-            background: #ff8800;
-            color: black;
-            font-size: 0.7rem;
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: 0.3s;
+                width: 260px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-top: 70px;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        /* chat */
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            border-radius: 24px;
+            padding: 1rem;
+        }
+        .message-bubble {
+            background: #1E2235;
+            margin: 10px 0;
+            padding: 10px 16px;
             border-radius: 20px;
-            padding: 2px 8px;
         }
 
-        .money-effect {
-            animation: moneyBlast 0.5s ease-out;
-        }
-        @keyframes moneyBlast {
-            0% { text-shadow: 0 0 0 #ffd966; transform: scale(1);}
-            50% { text-shadow: 0 0 20px #ffaa33; transform: scale(1.05);}
-        }
+        /* scroll */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #141824; }
+        ::-webkit-scrollbar-thumb { background: #F0B90B; border-radius: 10px; }
     </style>
 </head>
 <body>
-<div class="app-container" id="appRoot"></div>
+<canvas id="bg-canvas"></canvas>
+<div class="app-wrapper" id="app">
+    <!-- dynamic rendering -->
+</div>
 
 <script>
-    // ---------- STORAGE KEYS ----------
-    const STORAGE_USERS = "maua_users";
-    const STORAGE_GLOBAL_MSGS = "maua_global_chat";
-    const DEFAULT_ADMIN = { username: "admin", pin: "1234", role: "admin", balance: 0, deposits: [], withdrawals: [], pendingDeposits: [] };
-
-    // ---------- helpers ----------
-    function getUsers() {
-        const raw = localStorage.getItem(STORAGE_USERS);
-        if(!raw) {
-            const initial = [DEFAULT_ADMIN];
-            localStorage.setItem(STORAGE_USERS, JSON.stringify(initial));
-            return initial;
-        }
-        return JSON.parse(raw);
-    }
-
-    function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
-
-    function getMessages() {
-        const raw = localStorage.getItem(STORAGE_GLOBAL_MSGS);
-        return raw ? JSON.parse(raw) : [];
-    }
-    function saveMessages(msgs) { localStorage.setItem(STORAGE_GLOBAL_MSGS, JSON.stringify(msgs)); }
-
-    let currentUser = null; // { username, pin, role, balance, deposits, withdrawals, pendingDeposits }
-
-    // helpers: compute matured values for 6m deposits (5% APY compounded monthly over 6 months)
-    function calcMatured6m(principal) {
-        const r = 0.05, n = 12, t = 0.5;
-        return Math.floor(principal * Math.pow((1 + r/n), n*t));
-    }
-    // 24h plan: 19% instant growth but locked 24h (after 24h you can withdraw)
-    function calc24hMatured(principal) { return Math.floor(principal * 1.19); }
-
-    // update user data & persist
-    function updateCurrentUserAndSave(newData) {
-        if(!currentUser) return;
-        const users = getUsers();
-        const idx = users.findIndex(u => u.username === currentUser.username);
-        if(idx !== -1) {
-            users[idx] = { ...newData };
-            currentUser = { ...newData };
-            saveUsers(users);
-        }
-        renderApp();
-    }
-
-    // get unlocked balances (24h deposits where unlock24 <= now, and 6m deposits where unlock6m <= now)
-    function getAvailableBalance(user) {
-        const now = new Date();
-        let unlocked = 0;
-        if(user.deposits) {
-            user.deposits.forEach(dep => {
-                if(dep.type === '24h') {
-                    if(new Date(dep.unlockDate) <= now) unlocked += dep.maturedValue;
-                } else if(dep.type === '6m') {
-                    if(new Date(dep.unlockDate) <= now) unlocked += dep.maturedValue;
-                }
-            });
-        }
-        return unlocked;
-    }
-
-    function getTotalBalance(user) {
-        if(!user.deposits) return 0;
-        return user.deposits.reduce((sum, d) => sum + d.maturedValue, 0);
-    }
-
-    function getLockedBalance(user) {
-        const now = new Date();
-        if(!user.deposits) return 0;
-        return user.deposits.reduce((sum, d) => {
-            if(new Date(d.unlockDate) > now) return sum + d.maturedValue;
-            return sum;
-        }, 0);
-    }
-
-    // admin approve pending deposit (simulate M-Pesa)
-    function adminApproveDeposit(username, pendingId) {
-        const users = getUsers();
-        const userIdx = users.findIndex(u => u.username === username);
-        if(userIdx === -1) return false;
-        const user = users[userIdx];
-        const pendingIndex = (user.pendingDeposits || []).findIndex(p => p.id === pendingId);
-        if(pendingIndex === -1) return false;
-        const pending = user.pendingDeposits[pendingIndex];
-        // add real deposit (based on plan selected)
-        const newDeposit = {
-            id: Date.now() + Math.random()*10000,
-            amount: pending.amount,
-            depositDate: new Date().toISOString(),
-            unlockDate: pending.unlockDateISO,
-            maturedValue: pending.maturedValue,
-            type: pending.planType,
-        };
-        if(!user.deposits) user.deposits = [];
-        user.deposits.push(newDeposit);
-        user.pendingDeposits.splice(pendingIndex,1);
-        saveUsers(users);
-        if(currentUser && currentUser.username === username) {
-            currentUser = { ...user };
-            renderApp();
-        }
-        return true;
-    }
-
-    // withdraw logic
-    function processWithdrawal(amountKES) {
-        if(!currentUser) return false;
-        const available = getAvailableBalance(currentUser);
-        if(amountKES < 1500) { alert("Min withdrawal 1,500 KES"); return false; }
-        if(amountKES > 10000) { alert("Max per withdrawal 10,000 KES"); return false; }
-        if(amountKES > available) { alert("Insufficient unlocked balance"); return false; }
-
-        let remaining = amountKES;
-        const updatedDeposits = [];
-        for(let dep of currentUser.deposits) {
-            const isUnlocked = new Date(dep.unlockDate) <= new Date();
-            if(isUnlocked && remaining > 0 && dep.maturedValue > 0) {
-                if(dep.maturedValue <= remaining) {
-                    remaining -= dep.maturedValue;
-                    continue;
-                } else {
-                    dep.maturedValue -= remaining;
-                    remaining = 0;
-                    updatedDeposits.push(dep);
-                }
-            } else {
-                updatedDeposits.push(dep);
-            }
-        }
-        if(remaining > 0) return false;
-        const newDeposits = updatedDeposits.filter(d => d.maturedValue > 0);
-        if(!currentUser.withdrawals) currentUser.withdrawals = [];
-        currentUser.withdrawals.push({ amount: amountKES, date: new Date().toISOString() });
-        currentUser.deposits = newDeposits;
-        updateCurrentUserAndSave(currentUser);
-        alert(`✅ Withdrawn ${amountKES.toLocaleString()} KES successfully!`);
-        return true;
-    }
-
-    // create pending deposit (user requests)
-    function requestDeposit(amount, planType) {
-        if(!currentUser) return;
-        if(amount < 1500) { alert("Minimum deposit 1,500 KES"); return; }
-        let maturedValue, unlockDateISO;
-        const nowDate = new Date();
-        if(planType === '24h') {
-            maturedValue = calc24hMatured(amount);
-            const unlock = new Date(nowDate);
-            unlock.setHours(unlock.getHours() + 24);
-            unlockDateISO = unlock.toISOString();
+    // ----------------------------- SUPABASE CONFIG (REPLACE WITH YOUR CREDENTIALS) ---------------------------------
+    const SUPABASE_URL = "https://your-project.supabase.co";   // <-- REPLACE
+    const SUPABASE_ANON_KEY = "your-anon-key";                // <-- REPLACE
+    // For demo purposes, if not configured we show mock warning but app will simulate localstorage demo.
+    // To make fully functional, user must replace with actual Supabase keys.
+    let supabase = null;
+    let isSupabaseReady = false;
+    try {
+        if (SUPABASE_URL.includes("your-project") === false && SUPABASE_ANON_KEY.includes("your-anon") === false) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            isSupabaseReady = true;
+            console.log("✅ Supabase connected");
         } else {
-            maturedValue = calcMatured6m(amount);
-            const unlock = new Date(nowDate);
-            unlock.setMonth(unlock.getMonth() + 6);
-            unlockDateISO = unlock.toISOString();
+            console.warn("⚠️ Supabase credentials missing. Using demo localStorage mode (full features demo).");
         }
-        const pendingId = Date.now() + Math.random();
-        const pendingItem = {
-            id: pendingId,
-            amount: amount,
-            planType: planType,
-            maturedValue: maturedValue,
-            unlockDateISO: unlockDateISO,
-            requestedAt: new Date().toISOString(),
-            phoneNumber: "+254 742 383238"
-        };
-        if(!currentUser.pendingDeposits) currentUser.pendingDeposits = [];
-        currentUser.pendingDeposits.push(pendingItem);
-        updateCurrentUserAndSave(currentUser);
-        alert(`📱 Deposit request sent! Send ${amount} KES to ${pendingItem.phoneNumber} via M-Pesa. Admin will confirm.`);
-        renderApp();
+    } catch(e) { console.warn("Supabase init failed", e); }
+
+    // ----------------------------- GLOBAL STATE (fallback demo if no supabase) ------------------------------------
+    let currentUser = null;      // { id, email, phone, role, balance }
+    let demoUsers = JSON.parse(localStorage.getItem("nove_demo_users")) || [];
+    let demoTransactions = JSON.parse(localStorage.getItem("nove_demo_transactions")) || [];
+    let demoChat = JSON.parse(localStorage.getItem("nove_demo_chat")) || [];
+    let demoNotifications = JSON.parse(localStorage.getItem("nove_demo_notifications")) || [];
+
+    // Helper: save demo data
+    function saveDemoData() {
+        localStorage.setItem("nove_demo_users", JSON.stringify(demoUsers));
+        localStorage.setItem("nove_demo_transactions", JSON.stringify(demoTransactions));
+        localStorage.setItem("nove_demo_chat", JSON.stringify(demoChat));
+        localStorage.setItem("nove_demo_notifications", JSON.stringify(demoNotifications));
     }
 
-    // global chat
-    function sendGlobalMessage(text) {
-        if(!currentUser) return;
-        if(!text.trim()) return;
-        const msgs = getMessages();
-        msgs.push({
-            user: currentUser.username,
-            text: text.substring(0, 200),
-            timestamp: new Date().toISOString(),
-            role: currentUser.role || "user"
+    // Initialize demo admin if none
+    if (!demoUsers.find(u => u.role === "admin")) {
+        demoUsers.push({
+            id: "admin_1",
+            email: "admin@novewealth.com",
+            phone: "+254700000000",
+            password: "admin123",
+            role: "admin",
+            balance: 0,
+            created_at: new Date().toISOString()
         });
-        saveMessages(msgs);
-        renderApp();
+        saveDemoData();
     }
 
-    // -------- RENDERING (login vs dashboard) ----------
+    // Auth helpers (demo mode fallback)
+    async function demoRegister(email, phone, password) {
+        if (demoUsers.find(u => u.email === email)) return { error: "Email already exists" };
+        const newUser = {
+            id: "user_" + Date.now(),
+            email, phone, password, role: "user", balance: 25000, // starting demo balance
+            created_at: new Date().toISOString()
+        };
+        demoUsers.push(newUser);
+        saveDemoData();
+        return { user: newUser };
+    }
+    async function demoLogin(email, password) {
+        const user = demoUsers.find(u => u.email === email && u.password === password);
+        if (!user) return { error: "Invalid credentials" };
+        return { user };
+    }
+    async function getRealTimeChat(callback) { if(!supabase) { /* demo polling */ setInterval(()=>callback(demoChat), 2000); } }
+    // --------------------------------------------------------------
+    // UI RENDER
+    let currentView = "dashboard";
+    let chartInstance = null;
+
     function renderApp() {
-        const root = document.getElementById("appRoot");
-        if(!currentUser) {
-            root.innerHTML = renderLoginScreen();
+        const appDiv = document.getElementById("app");
+        if (!currentUser) {
+            appDiv.innerHTML = renderLogin();
             attachLoginEvents();
         } else {
-            root.innerHTML = renderDashboard();
-            attachDashboardEvents();
-            autoScrollChat();
+            appDiv.innerHTML = renderMainLayout();
+            attachNavEvents();
+            if (currentView === "dashboard") renderDashboardContent();
+            if (currentView === "wallet") renderWalletContent();
+            if (currentView === "transactions") renderTransactionsContent();
+            if (currentView === "chat") renderChatContent();
+            if (currentView === "settings") renderSettingsContent();
+            if (currentUser.role === "admin" && currentView === "admin") renderAdminPanel();
+            attachGlobalListeners();
         }
+        initThreeBackground();
     }
 
-    function renderLoginScreen() {
+    function renderLogin() {
         return `
-            <div class="glass-card login-box" style="max-width:450px; margin:5rem auto; text-align:center;">
-                <h1 style="color:#F7D44A; margin-bottom:1rem;">💰 MAOMAO FINANCE</h1>
-                <p style="margin-bottom:2rem; color:#bbb;">19% in 24h • 6-Month 5% APY</p>
-                <div style="margin:1rem 0;">
-                    <input type="text" id="loginUsername" placeholder="Username" style="margin-bottom:12px;">
-                    <input type="password" id="loginPin" placeholder="PIN (digits)">
-                    <button id="loginBtn" style="margin-top:20px;">🔓 Login / Register</button>
+        <div style="min-height:100vh; display:flex; align-items:center; justify-content:center; background: radial-gradient(circle at 20% 30%, #0a0c14, #010101);">
+            <div class="stat-card" style="width: 450px; max-width:90%; text-align:center;">
+                <h2 style="color:#F0B90B;">NOVE WEALTH</h2>
+                <p style="margin:20px 0">Premium Fintech Dashboard</p>
+                <div id="loginTab" style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button id="showLoginBtn" class="btn-gold" style="flex:1;">Login</button>
+                    <button id="showRegisterBtn" style="flex:1; background:#2d3348;">Register</button>
                 </div>
-                <div class="small-info" style="font-size:0.7rem;">New users: just enter new username + PIN → auto register. Admin: admin / 1234</div>
-                <div style="margin-top:20px; font-size:0.7rem;">📞 Deposit M-Pesa: +254 742 383238</div>
+                <div id="loginForm">
+                    <input type="email" id="loginEmail" placeholder="Email" style="margin-bottom:12px;">
+                    <input type="password" id="loginPassword" placeholder="Password">
+                    <button id="doLoginBtn" class="btn-gold" style="margin-top:20px; width:100%;">Access Dashboard</button>
+                </div>
+                <div id="registerForm" style="display:none;">
+                    <input type="email" id="regEmail" placeholder="Email" style="margin-bottom:12px;">
+                    <input type="text" id="regPhone" placeholder="Phone number" style="margin-bottom:12px;">
+                    <input type="password" id="regPassword" placeholder="Password">
+                    <button id="doRegisterBtn" class="btn-gold" style="margin-top:20px; width:100%;">Create Account</button>
+                </div>
+                <div class="demo-note" style="margin-top:20px; font-size:0.7rem;">Demo: admin@novewealth.com / admin123</div>
             </div>
-        `;
+        </div>`;
     }
 
     function attachLoginEvents() {
-        const loginBtn = document.getElementById("loginBtn");
-        if(loginBtn) {
-            loginBtn.onclick = () => {
-                const username = document.getElementById("loginUsername").value.trim();
-                const pin = document.getElementById("loginPin").value.trim();
-                if(!username || !pin) { alert("Enter username & PIN"); return; }
-                let users = getUsers();
-                let user = users.find(u => u.username === username);
-                if(user) {
-                    if(user.pin !== pin) { alert("Wrong PIN"); return; }
-                    currentUser = { ...user };
-                    renderApp();
-                } else {
-                    const newUser = {
-                        username: username,
-                        pin: pin,
-                        role: "user",
-                        balance: 0,
-                        deposits: [],
-                        withdrawals: [],
-                        pendingDeposits: []
-                    };
-                    users.push(newUser);
-                    saveUsers(users);
-                    currentUser = { ...newUser };
-                    renderApp();
-                }
-            };
-        }
+        document.getElementById("showLoginBtn")?.addEventListener("click",()=>{
+            document.getElementById("loginForm").style.display="block";
+            document.getElementById("registerForm").style.display="none";
+        });
+        document.getElementById("showRegisterBtn")?.addEventListener("click",()=>{
+            document.getElementById("loginForm").style.display="none";
+            document.getElementById("registerForm").style.display="block";
+        });
+        document.getElementById("doLoginBtn")?.addEventListener("click", async ()=>{
+            const email = document.getElementById("loginEmail").value;
+            const pwd = document.getElementById("loginPassword").value;
+            const res = await demoLogin(email, pwd);
+            if(res.error) alert(res.error);
+            else { currentUser = res.user; renderApp(); }
+        });
+        document.getElementById("doRegisterBtn")?.addEventListener("click", async ()=>{
+            const email = document.getElementById("regEmail").value;
+            const phone = document.getElementById("regPhone").value;
+            const pwd = document.getElementById("regPassword").value;
+            const res = await demoRegister(email, phone, pwd);
+            if(res.error) alert(res.error);
+            else { alert("Registration success! Please login"); document.getElementById("showLoginBtn").click(); }
+        });
     }
 
-    function renderDashboard() {
-        if(!currentUser) return "";
+    function renderMainLayout() {
         const isAdmin = currentUser.role === "admin";
-        const availableBal = getAvailableBalance(currentUser);
-        const totalBal = getTotalBalance(currentUser);
-        const lockedBal = getLockedBalance(currentUser);
-        const messages = getMessages();
         return `
-            <div class="dashboard-main">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
-                    <div><h2 style="color:#F7D44A;">👋 ${currentUser.username} ${isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}</h2></div>
-                    <button id="logoutBtn" style="background:#2c2f3f; color:#ffd966;">🚪 Logout</button>
-                </div>
-
-                <!-- stats row -->
-                <div class="stats-grid" style="display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:2rem;">
-                    <div class="glass-card" style="flex:1; text-align:center;"><div>💰 TOTAL BALANCE</div><div style="font-size:2rem;">${totalBal.toLocaleString()} KES</div></div>
-                    <div class="glass-card" style="flex:1; text-align:center;"><div>🔒 LOCKED</div><div style="font-size:2rem;">${lockedBal.toLocaleString()} KES</div></div>
-                    <div class="glass-card" style="flex:1; text-align:center;"><div>✅ AVAILABLE (unlocked)</div><div style="font-size:2rem; color:#9bef8f;">${availableBal.toLocaleString()} KES</div></div>
-                </div>
-
-                <!-- investment plans -->
-                <div style="display:flex; flex-wrap:wrap; gap:1.5rem; margin-bottom:2rem;">
-                    <div class="plan-card" style="flex:1;">
-                        <h3>⚡ 24H TURBO • 19% RETURN</h3>
-                        <p>Deposit locks for 24h → +19% profit (example: 10,000 KES → 11,900 KES)</p>
-                        <div class="input-group" style="margin:10px 0;"><input type="number" id="turboAmount" placeholder="Min 1,500 KES" min="1500"></div>
-                        <button id="investTurboBtn">🚀 Invest 24H (19%)</button>
-                        <div class="small-info" style="font-size:0.7rem;">📞 Send money to +254 742 383238, admin approves.</div>
-                    </div>
-                    <div class="plan-card" style="flex:1;">
-                        <h3>🏦 6-MONTH LOCK • 5% APY</h3>
-                        <p>Compounded monthly → mature value + interest after 6 months</p>
-                        <div class="input-group" style="margin:10px 0;"><input type="number" id="sixMonthAmount" placeholder="Min 1,500 KES" min="1500"></div>
-                        <button id="investSixBtn">🔒 Lock 6 Months</button>
-                        <div class="small-info">Full amount + interest unlocked after 180 days</div>
-                    </div>
-                </div>
-
-                <!-- Withdraw section -->
-                <div class="glass-card" style="margin-bottom:2rem;">
-                    <h3>💸 Withdraw Funds (min 1,500 | max 10,000 KES per tx)</h3>
-                    <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
-                        <input type="number" id="withdrawAmountInput" placeholder="Amount KES" style="flex:2;" min="1500" max="10000">
-                        <button id="withdrawActionBtn">💳 Withdraw</button>
-                    </div>
-                    <div class="small-info">Available unlocked: ${availableBal.toLocaleString()} KES</div>
-                </div>
-
-                <!-- Active deposits with timers & crazy effect -->
-                <div class="glass-card" style="margin-bottom:2rem;">
-                    <h3>📈 Your Active Deposits (real-time)</h3>
-                    <div id="activeDepositsList">${renderDepositsList()}</div>
-                </div>
-
-                <!-- ADMIN PANEL: pending deposits -->
-                ${isAdmin ? `<div class="glass-card" style="margin-bottom:2rem; border-color:#ffaa33;">
-                    <h3>👑 ADMIN: Pending M-Pesa Deposits</h3>
-                    <div id="adminPendingList">${renderAdminPending()}</div>
-                </div>` : ''}
-
-                <!-- GLOBAL CHAT -->
-                <div class="glass-card">
-                    <h3>💬 GLOBAL CHAT • everyone sees messages</h3>
-                    <div id="chatMessages" style="height:200px; overflow-y:auto; background:#03060c80; border-radius:1rem; padding:0.5rem; margin-bottom:10px;">
-                        ${messages.map(m => `<div class="chat-message"><strong>${m.user}</strong> ${m.role==='admin'?'⭐':''}: ${m.text} <span style="font-size:0.6rem; color:#aaa;">${new Date(m.timestamp).toLocaleTimeString()}</span></div>`).join('')}
-                    </div>
-                    <div style="display:flex; gap:0.5rem;">
-                        <input type="text" id="chatInput" placeholder="Type message for everyone..." style="flex:3;">
-                        <button id="sendChatBtn">📢 Send</button>
-                    </div>
-                </div>
-                <div style="margin-top:1rem; font-size:0.7rem; text-align:center;">📱 Deposit phone: +254 742 383238 • admin approves after payment</div>
-            </div>
+        <div class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></div>
+        <div class="sidebar" id="sidebar">
+            <div class="logo">NOVE WEALTH</div>
+            <div class="nav-item" data-view="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
+            <div class="nav-item" data-view="wallet"><i class="fas fa-wallet"></i> Wallet</div>
+            <div class="nav-item" data-view="transactions"><i class="fas fa-exchange-alt"></i> Transactions</div>
+            <div class="nav-item" data-view="chat"><i class="fas fa-comments"></i> Global Chat</div>
+            <div class="nav-item" data-view="settings"><i class="fas fa-user-cog"></i> Settings</div>
+            ${isAdmin ? `<div class="nav-item" data-view="admin"><i class="fas fa-shield-alt"></i> Admin Panel</div>` : ''}
+            <div class="nav-item" id="logoutBtn" style="margin-top:40px;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+        </div>
+        <div class="main-content" id="mainContent">
+            <div id="dynamicView">Loading...</div>
+        </div>
+        <div id="notificationContainer"></div>
         `;
     }
 
-    function renderDepositsList() {
-        if(!currentUser.deposits || currentUser.deposits.length === 0) return "<div>✨ No active deposits. Invest now!</div>";
-        const now = new Date();
-        return currentUser.deposits.map(dep => {
-            const unlockDate = new Date(dep.unlockDate);
-            const isUnlocked = unlockDate <= now;
-            let countdown = "";
-            if(!isUnlocked) {
-                const diff = unlockDate - now;
-                if(dep.type === '24h') {
-                    const hoursLeft = Math.max(0, Math.floor(diff / (1000*60*60)));
-                    const minutes = Math.floor((diff % (3600000))/60000);
-                    countdown = `⏳ unlocks in ${hoursLeft}h ${minutes}m`;
-                } else {
-                    const days = Math.floor(diff / (86400000));
-                    countdown = `📅 unlocks in ${days} days`;
-                }
-            } else countdown = "✅ UNLOCKED READY";
-            const interest = dep.maturedValue - dep.amount;
-            return `<div class="stat-badge" style="margin-bottom:8px; display:flex; justify-content:space-between; flex-wrap:wrap;">
-                        <span><strong>${dep.type === '24h' ? '⚡24H 19%' : '🏦6-Month'}</strong> ${dep.amount.toLocaleString()} KES → ${dep.maturedValue.toLocaleString()} KES (+${interest.toLocaleString()})</span>
-                        <span>${countdown}</span>
-                    </div>`;
-        }).join('');
+    function attachNavEvents() {
+        document.querySelectorAll(".nav-item[data-view]").forEach(el => {
+            el.addEventListener("click", (e) => {
+                currentView = el.getAttribute("data-view");
+                document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+                el.classList.add("active");
+                renderApp();
+            });
+        });
+        document.getElementById("logoutBtn")?.addEventListener("click", () => { currentUser = null; renderApp(); });
+        document.getElementById("mobileMenuBtn")?.addEventListener("click", () => {
+            document.getElementById("sidebar")?.classList.toggle("open");
+        });
     }
 
-    function renderAdminPending() {
-        const users = getUsers();
-        let pendingHtml = "";
-        for(let user of users) {
-            if(user.pendingDeposits && user.pendingDeposits.length) {
-                user.pendingDeposits.forEach(pend => {
-                    pendingHtml += `<div style="background:#1e1a2f; margin:8px; padding:8px; border-radius:1rem;">
-                        <strong>${user.username}</strong> | ${pend.planType} | ${pend.amount.toLocaleString()} KES → matured ${pend.maturedValue.toLocaleString()}
-                        <button class="approvePendingBtn" data-user="${user.username}" data-id="${pend.id}">✅ Approve Deposit</button>
-                    </div>`;
+    // Dashboard with chart
+    function renderDashboardContent() {
+        const userTx = demoTransactions.filter(tx => tx.userId === currentUser.id);
+        const balance = currentUser.balance || 0;
+        const chartData = userTx.filter(t => t.type === "deposit").map(t => t.amount);
+        const labels = userTx.slice(-7).map((_,i)=>`Tx${i+1}`);
+        setTimeout(() => {
+            const ctx = document.getElementById("balanceChart")?.getContext("2d");
+            if(ctx && chartInstance) chartInstance.destroy();
+            if(ctx) {
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: labels.length?labels:["Week1"], datasets: [{ label: 'Balance Trend (KES)', data: chartData.length?chartData:[balance], borderColor: '#F0B90B', tension: 0.3 }] }
                 });
             }
-        }
-        if(!pendingHtml) return "No pending deposits awaiting confirmation.";
-        return pendingHtml;
+        }, 100);
+        const pendingDeposits = demoTransactions.filter(tx => tx.userId === currentUser.id && tx.status === "pending" && tx.type === "deposit");
+        const pendingWithdrawals = demoTransactions.filter(tx => tx.userId === currentUser.id && tx.status === "pending" && tx.type === "withdraw");
+        document.getElementById("dynamicView").innerHTML = `
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap;"><h2>Welcome, ${currentUser.email}</h2><span style="background:#1E2235; padding:6px 12px; border-radius:40px;"><i class="fas fa-phone"></i> ${currentUser.phone || "—"}</span></div>
+            <div class="stat-card" style="margin:20px 0;"><h3>Total Balance</h3><div style="font-size:3rem; font-weight:800;">${balance.toLocaleString()} KES</div></div>
+            <div class="stat-card"><canvas id="balanceChart" height="100"></canvas></div>
+            <div class="stat-card" style="margin-top:20px;"><h3>Pending Requests</h3><p>Deposits: ${pendingDeposits.length} | Withdrawals: ${pendingWithdrawals.length}</p></div>
+            <div class="stat-card" style="margin-top:20px;"><h3>📢 Notifications</h3><div id="userNotifList">${demoNotifications.filter(n=>n.userId===currentUser.id).map(n=>`<div>🔔 ${n.message}</div>`).join('')||"No new alerts"}</div></div>
+        `;
     }
 
-    function attachDashboardEvents() {
-        document.getElementById("logoutBtn")?.addEventListener("click", () => { currentUser = null; renderApp(); });
-        document.getElementById("investTurboBtn")?.addEventListener("click", () => {
-            const amount = parseFloat(document.getElementById("turboAmount").value);
-            if(!amount || amount<1500) alert("Minimum 1,500 KES");
-            else requestDeposit(amount, "24h");
+    function renderWalletContent() {
+        document.getElementById("dynamicView").innerHTML = `
+            <h2>Wallet & Transactions</h2>
+            <div class="stat-card"><h3>Request Deposit</h3><input type="number" id="depositAmount" placeholder="Amount KES" min="100"><button id="reqDepositBtn" class="btn-gold" style="margin-top:12px;">Submit Deposit Request</button><p style="font-size:0.7rem;">Admin will approve after M-Pesa confirmation.</p></div>
+            <div class="stat-card" style="margin-top:20px;"><h3>Request Withdrawal</h3><input type="number" id="withdrawAmount" placeholder="Amount KES"><button id="reqWithdrawBtn" class="btn-gold">Request Withdrawal</button></div>
+        `;
+        document.getElementById("reqDepositBtn")?.addEventListener("click", () => {
+            const amt = parseFloat(document.getElementById("depositAmount").value);
+            if(amt<100) return alert("Minimum 100 KES");
+            demoTransactions.push({ id: Date.now(), userId: currentUser.id, type: "deposit", amount: amt, status: "pending", date: new Date().toISOString() });
+            saveDemoData();
+            alert("Deposit request sent to admin.");
+            renderApp();
         });
-        document.getElementById("investSixBtn")?.addEventListener("click", () => {
-            const amount = parseFloat(document.getElementById("sixMonthAmount").value);
-            if(!amount || amount<1500) alert("Minimum 1,500 KES");
-            else requestDeposit(amount, "6m");
+        document.getElementById("reqWithdrawBtn")?.addEventListener("click", () => {
+            const amt = parseFloat(document.getElementById("withdrawAmount").value);
+            if(amt<500) return alert("Min withdrawal 500 KES");
+            if(amt > currentUser.balance) return alert("Insufficient balance");
+            demoTransactions.push({ id: Date.now(), userId: currentUser.id, type: "withdraw", amount: amt, status: "pending", date: new Date().toISOString() });
+            saveDemoData();
+            alert("Withdrawal request sent.");
+            renderApp();
         });
-        document.getElementById("withdrawActionBtn")?.addEventListener("click", () => {
-            const amt = parseFloat(document.getElementById("withdrawAmountInput").value);
-            if(!amt) alert("Enter amount");
-            else processWithdrawal(amt);
+    }
+
+    function renderTransactionsContent() {
+        const userTx = demoTransactions.filter(tx => tx.userId === currentUser.id).sort((a,b)=>new Date(b.date)-new Date(a.date));
+        document.getElementById("dynamicView").innerHTML = `<h2>Transaction History</h2><div class="stat-card">${userTx.map(tx=>`<div style="display:flex; justify-content:space-between; border-bottom:1px solid #222; padding:12px;"><span>${tx.type.toUpperCase()}</span><span>${tx.amount} KES</span><span>${tx.status}</span><span>${new Date(tx.date).toLocaleString()}</span></div>`).join('')||"No transactions"}</div>`;
+    }
+
+    function renderChatContent() {
+        const chatDiv = document.getElementById("dynamicView");
+        chatDiv.innerHTML = `<h2>💬 Global Community Chat</h2><div class="chat-container" id="chatMessagesContainer">${demoChat.map(m=>`<div class="message-bubble"><strong>${m.username}</strong>: ${m.text}<div style="font-size:0.6rem;">${new Date(m.timestamp).toLocaleTimeString()}</div></div>`).join('')}</div><div style="display:flex; gap:10px; margin-top:15px;"><input type="text" id="chatMsgInput" placeholder="Type message..."><button id="sendChatMsgBtn" class="btn-gold">Send</button></div>`;
+        const sendBtn = document.getElementById("sendChatMsgBtn");
+        const input = document.getElementById("chatMsgInput");
+        sendBtn?.addEventListener("click", () => {
+            if(!input.value.trim()) return;
+            demoChat.push({ username: currentUser.email, text: input.value, timestamp: new Date().toISOString(), userId: currentUser.id });
+            saveDemoData();
+            renderChatContent();
         });
-        document.getElementById("sendChatBtn")?.addEventListener("click", () => {
-            const input = document.getElementById("chatInput");
-            sendGlobalMessage(input.value);
-            input.value = "";
-        });
-        // admin approve dynamic buttons
-        document.querySelectorAll(".approvePendingBtn").forEach(btn => {
+        setInterval(() => { if(currentView === "chat") renderChatContent(); }, 3000);
+    }
+
+    function renderSettingsContent() {
+        document.getElementById("dynamicView").innerHTML = `<div class="stat-card"><h3>Account Settings</h3><p>Email: ${currentUser.email}</p><p>Phone: ${currentUser.phone || "—"}</p><p>Role: ${currentUser.role}</p><button id="changePassDemoBtn" class="btn-gold">Change Password (Demo)</button></div>`;
+        document.getElementById("changePassDemoBtn")?.addEventListener("click",()=>alert("Feature in full version."));
+    }
+
+    function renderAdminPanel() {
+        if(currentUser.role !== "admin") return;
+        const pendingTx = demoTransactions.filter(tx => tx.status === "pending");
+        const allUsers = demoUsers;
+        document.getElementById("dynamicView").innerHTML = `
+            <h2>🛠️ Admin Control</h2>
+            <div class="stat-card"><h3>Pending Approvals</h3>${pendingTx.map(tx=>{
+                const user = demoUsers.find(u=>u.id===tx.userId);
+                return `<div style="margin:10px 0; padding:10px; background:#1a1e2a;">${user?.email} - ${tx.type} - ${tx.amount} KES <button class="approveTxBtn" data-id="${tx.id}">✅ Approve</button> <button class="rejectTxBtn" data-id="${tx.id}">❌ Reject</button></div>`;
+            }).join('') || "No pending"}</div>
+            <div class="stat-card"><h3>All Users</h3>${allUsers.map(u=>`<div>${u.email} | Balance: ${u.balance} KES | Role: ${u.role} <button class="updateBalanceBtn" data-email="${u.email}">➕ Add Funds</button></div>`).join('')}</div>
+            <div class="stat-card"><h3>Send Global Notification</h3><textarea id="adminNotifMsg" placeholder="Message to all users"></textarea><button id="sendGlobalNotifBtn" class="btn-gold">Notify All</button></div>
+        `;
+        document.querySelectorAll(".approveTxBtn").forEach(btn => {
             btn.addEventListener("click", (e) => {
-                const username = btn.getAttribute("data-user");
-                const id = parseInt(btn.getAttribute("data-id"));
-                adminApproveDeposit(username, id);
-                renderApp(); // refresh admin view
-            });
-        });
-        // 24h +10% visual effect simulation when requesting? we add "moneyEffect" on click
-        const turboBtn = document.getElementById("investTurboBtn");
-        if(turboBtn) {
-            turboBtn.addEventListener("click", () => {
-                const amountInput = document.getElementById("turboAmount");
-                const val = parseFloat(amountInput?.value);
-                if(val>=1500) {
-                    const effectDiv = document.createElement("div");
-                    effectDiv.className = "money-effect";
-                    effectDiv.innerText = `🔥 +10% SURGE! 19% after 24h! 🔥`;
-                    effectDiv.style.position = "fixed"; effectDiv.style.bottom = "20%"; effectDiv.style.left="20%"; effectDiv.style.background="#ffaa33"; effectDiv.style.padding="12px"; effectDiv.style.borderRadius="30px"; effectDiv.style.zIndex="9999";
-                    document.body.appendChild(effectDiv);
-                    setTimeout(() => effectDiv.remove(), 1500);
+                const txId = parseInt(btn.getAttribute("data-id"));
+                const tx = demoTransactions.find(t => t.id === txId);
+                if(tx) {
+                    tx.status = "approved";
+                    const user = demoUsers.find(u => u.id === tx.userId);
+                    if(user && tx.type === "deposit") user.balance = (user.balance || 0) + tx.amount;
+                    if(user && tx.type === "withdraw") user.balance = (user.balance || 0) - tx.amount;
+                    saveDemoData();
+                    if(currentUser.id === user?.id) currentUser = user;
+                    renderApp();
                 }
             });
+        });
+        document.querySelectorAll(".rejectTxBtn").forEach(btn => {
+            btn.addEventListener("click", () => { const id = parseInt(btn.getAttribute("data-id")); const idx = demoTransactions.findIndex(t=>t.id===id); if(idx!==-1) demoTransactions.splice(idx,1); saveDemoData(); renderApp(); });
+        });
+        document.querySelectorAll(".updateBalanceBtn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const email = btn.getAttribute("data-email");
+                const user = demoUsers.find(u=>u.email===email);
+                const add = parseFloat(prompt("Add amount (KES)"));
+                if(user && add>0) { user.balance = (user.balance||0)+add; saveDemoData(); alert("Balance updated"); renderApp(); }
+            });
+        });
+        document.getElementById("sendGlobalNotifBtn")?.addEventListener("click",()=>{
+            const msg = document.getElementById("adminNotifMsg").value;
+            if(msg) {
+                demoUsers.forEach(u => { demoNotifications.push({ userId: u.id, message: `📢 ADMIN: ${msg}`, timestamp: new Date().toISOString() }); });
+                saveDemoData();
+                alert("Notification sent to all users.");
+                renderApp();
+            }
+        });
+    }
+
+    function attachGlobalListeners() {
+        // show notification popup
+        const notifContainer = document.getElementById("notificationContainer");
+        const userNotifs = demoNotifications.filter(n=>n.userId===currentUser.id && !n.seen);
+        if(userNotifs.length) {
+            userNotifs.forEach(n=>{
+                const toast = document.createElement("div");
+                toast.className = "notification-toast";
+                toast.innerText = n.message;
+                notifContainer.appendChild(toast);
+                setTimeout(()=>toast.remove(), 4000);
+                n.seen = true;
+            });
+            saveDemoData();
         }
     }
 
-    function autoScrollChat() {
-        const chatDiv = document.getElementById("chatMessages");
-        if(chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
+    // Three.js animated fintech background
+    let scene, camera, renderer, particles;
+    function initThreeBackground() {
+        if(document.getElementById("bg-canvas") && !window.threeInitialized) {
+            window.threeInitialized = true;
+            const canvas = document.getElementById("bg-canvas");
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, width/height, 0.1, 1000);
+            camera.position.z = 30;
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(width, height);
+            const geometry = new THREE.BufferGeometry();
+            const count = 1200;
+            const positions = new Float32Array(count * 3);
+            for(let i=0; i<count; i++) {
+                positions[i*3] = (Math.random() - 0.5) * 100;
+                positions[i*3+1] = (Math.random() - 0.5) * 60;
+                positions[i*3+2] = (Math.random() - 0.5) * 40 - 20;
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const material = new THREE.PointsMaterial({ color: 0xF0B90B, size: 0.2, transparent: true, opacity: 0.5 });
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+            function animate() {
+                requestAnimationFrame(animate);
+                particles.rotation.y += 0.0005;
+                particles.rotation.x += 0.0003;
+                renderer.render(scene, camera);
+            }
+            animate();
+            window.addEventListener("resize", ()=>{
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth/window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+        }
     }
 
-    // periodic refresh to update timers (every second)
-    setInterval(() => {
-        if(currentUser) {
-            renderApp();
-        }
-    }, 1000);
-    // initial render
     renderApp();
+    if(!window.threeLoaded) {
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+        script.onload = () => initThreeBackground();
+        document.head.appendChild(script);
+        window.threeLoaded = true;
+    }
 </script>
 </body>
-  </html>
+</html>
