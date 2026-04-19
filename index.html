@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SPY NET • WebGL + GSAP • Ultimate Reset Hub</title>
+    <!-- GSAP & Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* WebGL canvas background */
+        #webgl-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            display: block;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, 'Segoe UI', monospace;
+            color: #eef4ff;
+            min-height: 100vh;
+            position: relative;
+            background: transparent;
+        }
+
+        /* glassmorphism overlay */
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            padding: 2rem 1.5rem;
+            backdrop-filter: blur(3px);
+        }
+
+        /* password overlay (same but enhanced) */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 6, 12, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: 0.3s;
+        }
+        .password-box {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            border: 1px solid #00ffccaa;
+            box-shadow: 0 20px 35px #000000aa;
+            transform: scale(0.9);
+            opacity: 0;
+            animation: fadeInScale 0.5s forwards;
+        }
+        @keyframes fadeInScale {
+            to { transform: scale(1); opacity: 1; }
+        }
+        .password-box h2 {
+            margin-bottom: 1rem;
+            color: #00ffcc;
+        }
+        .password-box input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            border: none;
+            background: #1e2a3a;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .password-box button {
+            background: #2c7da0;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+        }
+        .password-box button:hover {
+            background: #00aacc;
+            transform: scale(1.02);
+        }
+        .error-msg {
+            color: #ff8888;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        /* main hub (hidden initially) */
+        .cyber-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: none;
+            opacity: 0;
+        }
+
+        .spy-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            border-bottom: 2px solid #00ffcc66;
+            padding-bottom: 1.2rem;
+        }
+        .spy-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #00ffcc, #2a7faa, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px #00ffcc33;
+        }
+        .legal-warning {
+            background: #1e1a2fcc;
+            backdrop-filter: blur(10px);
+            border-left: 5px solid #ffaa33;
+            border-radius: 1.2rem;
+            padding: 1rem 1.8rem;
+            margin-bottom: 2rem;
+        }
+        .telemetry-section {
+            background: #0a0f1ccc;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.8rem;
+            margin-bottom: 2rem;
+            border: 1px solid #2a6f8f;
+        }
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .brand-card {
+            background: rgba(18, 25, 45, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 1.8rem;
+            border: 1px solid #2a3a55;
+            transition: 0.3s;
+        }
+        .brand-card:hover {
+            border-color: #00ffccaa;
+            transform: translateY(-5px);
+        }
+        .brand-header {
+            background: #0f1422;
+            padding: 1rem 1.2rem;
+            font-weight: 700;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #2a3a55;
+        }
+        .brand-body {
+            padding: 1.2rem;
+        }
+        .btn-remote {
+            display: block;
+            width: 100%;
+            background: #1e2f46;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: 600;
+            margin: 0.8rem 0;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .btn-remote:hover {
+            background: #2c4a6e;
+            transform: scale(1.02);
+        }
+        .hardware-guide {
+            background: #0a0f1a;
+            border-radius: 1rem;
+            padding: 0.7rem;
+            margin-top: 0.8rem;
+            font-size: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            border: 1px dashed #3a5a7a;
+            transition: 0.2s;
+        }
+        .hardware-details {
+            display: none;
+            background: #000000aa;
+            padding: 0.7rem;
+            border-radius: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+        }
+        .universal-recovery {
+            background: #0b1422cc;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid #2a6f8f;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 2rem;
+            opacity: 0.8;
+        }
+        @media (max-width: 700px) {
+            .spy-header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="webgl-bg"></canvas>
+    <div class="content-overlay">
+        <!-- Password Overlay -->
+        <div id="passwordOverlay" class="password-overlay">
+            <div class="password-box">
+                <h2>🔐 SPY NET TERMINAL</h2>
+                <p>Enter authorization key</p>
+                <input type="password" id="accessPassword" placeholder="Password" autocomplete="off">
+                <button id="unlockBtn">Unlock System</button>
+                <div id="passError" class="error-msg"></div>
+            </div>
+        </div>
+
+        <!-- MAIN HUB (hidden until password) -->
+        <div id="mainHub" class="cyber-container">
+            <div class="spy-header">
+                <h1>🕸️ SPY NET</h1>
+                <p>• LEGAL FACTORY RESET HUB • REMOTE & HARDWARE METHODS • ALL BRANDS •</p>
+            </div>
+
+            <!-- TELEMETRY SECTION -->
+            <div class="telemetry-section">
+                <h3>📡 TELEMETRY & OPERATIONAL CAPABILITIES</h3>
+                <ol>
+                    <li>🔗 <strong>Open official remote reset portals</strong> (Google Find My Device, Samsung Find My Mobile, Xiaomi Mi Cloud, Huawei Find Device, Oppo HeyTap, iCloud for iPhone) – one click from your PC.</li>
+                    <li>📱 <strong>Provide brand‑specific hardware button combinations</strong> for recovery mode (Pixel, Samsung, Xiaomi, OnePlus, Motorola, Sony, Nokia, iPhone).</li>
+                    <li>🔄 <strong>Guide you through a complete factory reset</strong> using either remote account‑based erasure or physical button recovery – step by step.</li>
+                    <li>⚠️ <strong>Legally wipe the forgotten pattern/PIN</strong> from any Android or iOS device, provided prerequisites are met (account linked / physical access).</li>
+                    <li>🧭 <strong>Universal hardware reset instructions</strong> that work on nearly all smartphones when the phone is offline or Find My Device is disabled.</li>
+                    <li>📋 <strong>Interactive toggle for detailed recovery steps</strong> – no external search needed; everything is inside the hub.</li>
+                    <li>⚡ <strong>Works for all major brands</strong> – Google, Samsung, Xiaomi, Huawei, OnePlus, Oppo, Realme, Motorola, Sony, Nokia, Apple iPhone.</li>
+                    <li>🛡️ <strong>Zero automated hacking or brute‑forcing</strong> – 100% legal, uses only manufacturer‑approved channels and hardware recovery menus.</li>
+                </ol>
+                <p style="margin-top: 0.8rem; font-size:0.8rem;">✅ <strong>Prerequisites for remote reset:</strong> Phone must be online, have Find My Device / respective cloud service enabled, and you must know the account password.</p>
+            </div>
+
+            <div class="legal-warning">
+                ⚡ <strong>TERMINAL DIRECTIVE:</strong> This tool provides <strong>official manufacturer portals & hardware reset guides</strong>. No code can directly break phone encryption. 
+                You <strong>must</strong> have the phone linked to a Google/Samsung/Xiaomi/etc. account (for remote reset) OR physical access for hardware reset. 
+                Remote reset wipes all data. Use legally on your own device only.
+            </div>
+
+            <!-- Brand Grid -->
+            <div class="brand-grid">
+                <div class="brand-card"><div class="brand-header">📱 GOOGLE / PIXEL</div><div class="brand-body"><button class="btn-remote" data-url="https://www.google.com/android/find">🌐 REMOTE RESET (Find My Device)</button><div class="hardware-guide" data-brand="google">🔧 HARDWARE MODE</div><div class="hardware-details" id="google-details">Pixel/Nexus: Power off → Volume Down + Power → Recovery → "Wipe data/factory reset".</div></div></div>
+                <div class="brand-card"><div class="brand-header">⭐ SAMSUNG</div><div class="brand-body"><button class="btn-remote" data-url="https://findmymobile.samsung.com/">🌐 REMOTE RESET (Find My Mobile)</button><div class="hardware-guide" data-brand="samsung">🔧 HARDWARE MODE</div><div class="hardware-details" id="samsung-details">Samsung: Power off → Volume Up + Power → Recovery → "Wipe data/factory reset".</div></div></div>
+                <div class="brand-card"><div class="brand-header">📲 XIAOMI / POCO</div><div class="brand-body"><button class="btn-remote" data-url="https://i.mi.com/find/">🌐 REMOTE RESET (Mi Cloud)</button><div class="hardware-guide" data-brand="xiaomi">🔧 HARDWARE MODE</div><div class="hardware-details" id="xiaomi-details">Xiaomi: Power off → Volume Up + Power → Recovery → "Wipe data".</div></div></div>
+                <div class="brand-card"><div class="brand-header">📡 HUAWEI / HONOR</div><div class="brand-body"><button class="btn-remote" data-url="https://cloud.huawei.com/findphone/">🌐 REMOTE RESET (Find Device)</button><div class="hardware-guide" data-brand="huawei">🔧 HARDWARE MODE</div><div class="hardware-details" id="huawei-details">Huawei: Power off → Volume Up + Power → eRecovery → "Wipe data".</div></div></div>
+                <div class="brand-card"><div class="brand-header">⚡ ONEPLUS / OPPO</div><div class="brand-body"><button class="btn-remote" data-url="https://cloud.oppo.com/find/">🌐 REMOTE RESET (HeyTap Cloud)</button><div class="hardware-guide" data-brand="oneplus">🔧 HARDWARE MODE</div><div class="hardware-details" id="oneplus-details">OnePlus/Oppo: Power off → Volume Down + Power → Recovery → "Wipe data".</div></div></div>
+                <div class="brand-card"><div class="brand-header">📟 MOTOROLA</div><div class="brand-body"><button class="btn-remote" data-url="https://www.google.com/android/find">🌐 REMOTE RESET (Google Find)</button><div class="hardware-guide" data-brand="motorola">🔧 HARDWARE MODE</div><div class="hardware-details" id="motorola-details">Moto: Power off → Volume Down + Power → Recovery → factory reset.</div></div></div>
+                <div class="brand-card"><div class="brand-header">🎮 SONY XPERIA</div><div class="brand-body"><button class="btn-remote" data-url="https://www.google.com/android/find">🌐 REMOTE RESET (Find My Device)</button><div class="hardware-guide" data-brand="sony">🔧 HARDWARE MODE</div><div class="hardware-details" id="sony-details">Sony: Power off → Volume Down + Power → Recovery → factory reset.</div></div></div>
+                <div class="brand-card"><div class="brand-header">📞 NOKIA</div><div class="brand-body"><button class="btn-remote" data-url="https://www.google.com/android/find">🌐 REMOTE RESET (Google Find)</button><div class="hardware-guide" data-brand="nokia">🔧 HARDWARE MODE</div><div class="hardware-details" id="nokia-details">Nokia: Power off → Volume Up + Power → Recovery → "Wipe data".</div></div></div>
+                <div class="brand-card"><div class="brand-header">🍏 APPLE iPhone</div><div class="brand-body"><button class="btn-remote" data-url="https://www.icloud.com/find">🌐 REMOTE RESET (iCloud Find)</button><div class="hardware-guide" data-brand="iphone">🔧 HARDWARE MODE</div><div class="hardware-details" id="iphone-details">iPhone: Use PC with iTunes/Finder → Recovery mode → Restore (wipes device).</div></div></div>
+            </div>
+
+            <div class="universal-recovery">
+                <h3>🛠️ UNIVERSAL HARDWARE RESET (ANY ANDROID)</h3>
+                <p>If remote reset impossible, use physical buttons:</p>
+                <ol style="margin-left: 1.5rem; margin-top: 0.8rem;">
+                    <li>Power off the phone.</li>
+                    <li>Press <strong>Volume Up + Power</strong> (or Volume Down + Power) until recovery appears.</li>
+                    <li>Navigate to <strong>"Wipe data/factory reset"</strong> → select with Power button.</li>
+                    <li>Confirm → reboot. <span style="color:#ffaa66;">⚠️ ALL DATA ERASED, pattern removed.</span></li>
+                </ol>
+            </div>
+            <div class="footer">
+                <p>🕸️ SPY NET • PASSWORD PROTECTED • LEGAL USE ONLY • Remote reset requires phone online & account linked.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // -------------------- WEBGL PARTICLE BACKGROUND --------------------
+        const canvas = document.getElementById('webgl-bg');
+        const scene = new THREE.Scene();
+        scene.background = null; // transparent, but we set clear color
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x03060c, 1); // dark blue-black
+        
+        // Particle system
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1500;
+        const posArray = new Float32Array(particlesCount * 3);
+        for(let i = 0; i < particlesCount * 3; i += 3) {
+            posArray[i] = (Math.random() - 0.5) * 30;
+            posArray[i+1] = (Math.random() - 0.5) * 20;
+            posArray[i+2] = (Math.random() - 0.5) * 20 - 10;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.08,
+            color: 0x00aaff,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        // Additional star-like particles
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 800;
+        const starPos = new Float32Array(starCount * 3);
+        for(let i = 0; i < starCount * 3; i += 3) {
+            starPos[i] = (Math.random() - 0.5) * 200;
+            starPos[i+1] = (Math.random() - 0.5) * 100;
+            starPos[i+2] = (Math.random() - 0.5) * 80 - 40;
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({ size: 0.04, color: 0x88aaff, transparent: true, opacity: 0.4 });
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+        
+        camera.position.z = 8;
+        
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+        });
+        
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            particlesMesh.rotation.y += 0.0005;
+            particlesMesh.rotation.x += 0.0003;
+            stars.rotation.y -= 0.0002;
+            stars.rotation.x += 0.0001;
+            // subtle camera movement
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 0.3 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        animateParticles();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // -------------------- GSAP ANIMATIONS + PASSWORD LOGIC --------------------
+        const overlay = document.getElementById('passwordOverlay');
+        const mainHub = document.getElementById('mainHub');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const passInput = document.getElementById('accessPassword');
+        const errorSpan = document.getElementById('passError');
+        const CORRECT_PASS = "skpynet@26";
+        
+        function unlockSystem() {
+            if (passInput.value === CORRECT_PASS) {
+                // GSAP animation for overlay fade out
+                gsap.to(overlay, {
+                    duration: 0.8,
+                    opacity: 0,
+                    scale: 0.9,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        overlay.style.display = 'none';
+                        mainHub.style.display = 'block';
+                        gsap.fromTo(mainHub, 
+                            { opacity: 0, y: 30 },
+                            { duration: 0.9, opacity: 1, y: 0, ease: "back.out(0.5)" }
+                        );
+                        // animate brand cards staggered
+                        gsap.fromTo('.brand-card', 
+                            { opacity: 0, y: 40 },
+                            { duration: 0.6, opacity: 1, y: 0, stagger: 0.05, ease: "power2.out" }
+                        );
+                        gsap.fromTo('.telemetry-section', { opacity: 0, x: -20 }, { duration: 0.7, opacity: 1, x: 0 });
+                        gsap.fromTo('.legal-warning', { opacity: 0, scale: 0.95 }, { duration: 0.5, opacity: 1, scale: 1 });
+                        // attach dynamic buttons after content visible
+                        attachRemoteAndHardwareEvents();
+                    }
+                });
+            } else {
+                errorSpan.innerText = '❌ Invalid password. Access denied.';
+                passInput.value = '';
+                gsap.to('.password-box', { duration: 0.1, x: 5, repeat: 3, yoyo: true, ease: "none" });
+            }
+        }
+        
+        unlockBtn.addEventListener('click', unlockSystem);
+        passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') unlockSystem(); });
+        
+        function attachRemoteAndHardwareEvents() {
+            const remoteBtns = document.querySelectorAll('.btn-remote');
+            remoteBtns.forEach(btn => {
+                btn.removeEventListener('click', remoteHandler);
+                btn.addEventListener('click', remoteHandler);
+            });
+            const hardwareGuides = document.querySelectorAll('.hardware-guide');
+            hardwareGuides.forEach(guide => {
+                const brand = guide.getAttribute('data-brand');
+                const detailsDiv = document.getElementById(`${brand}-details`);
+                if (detailsDiv) detailsDiv.style.display = 'none';
+                guide.removeEventListener('click', hardwareToggle);
+                guide.addEventListener('click', hardwareToggle);
+                function hardwareToggle() {
+                    if (detailsDiv.style.display === 'none') {
+                        gsap.to(detailsDiv, { duration: 0.2, autoAlpha: 1, display: 'block' });
+                    } else {
+                        gsap.to(detailsDiv, { duration: 0.2, autoAlpha: 0, display: 'none' });
+                    }
+                }
+            });
+        }
+        
+        function remoteHandler(e) {
+            const url = e.currentTarget.getAttribute('data-url');
+            if (url) window.open(url, '_blank');
+            else alert('Official portal URL missing.');
+        }
+        
+        // initial fallback: if hub becomes visible due to any reason, ensure events
+        const observer = new MutationObserver(() => {
+            if (mainHub.style.display === 'block') attachRemoteAndHardwareEvents();
+        });
+        observer.observe(mainHub, { attributes: true, attributeFilter: ['style'] });
+    </script>
+</body>
+  </html>
