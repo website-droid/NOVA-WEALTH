@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SPY NET • Kenya Edition • Email Recovery + Reset Hub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0f1e;
+            font-family: 'Inter', system-ui, 'Segoe UI', sans-serif;
+            color: #eef4ff;
+            padding: 2rem 1.5rem;
+        }
+        #passwordOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #03060c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .password-box {
+            background: #0f172a;
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            border: 1px solid #00ffcc;
+            box-shadow: 0 0 20px #00ffcc33;
+        }
+        .password-box h2 { color: #00ffcc; margin-bottom: 1rem; }
+        .password-box input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 2rem;
+            border: none;
+            background: #1e2a3a;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .password-box button {
+            background: #2c7da0;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            color: white;
+        }
+        .error-msg { color: #ff8888; font-size: 0.8rem; margin-top: 0.5rem; }
+        
+        #mainHub {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: none;
+        }
+        .spy-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #00ffcc66;
+            padding-bottom: 1rem;
+        }
+        .spy-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00ffcc, #2a7faa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .search-container {
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: center;
+        }
+        #brandSearch {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.8rem 1.2rem;
+            border-radius: 2rem;
+            border: none;
+            background: #1e2a3a;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            text-align: center;
+        }
+        #brandSearch::placeholder { color: #8aa0b5; }
+        
+        .guide-section {
+            background: #0a1a2a;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #ffaa33;
+        }
+        .guide-section h3 {
+            color: #ffaa33;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .step-list {
+            margin-left: 1.5rem;
+            line-height: 1.6;
+        }
+        .step-list li { margin: 0.5rem 0; }
+        .btn-guide {
+            background: #2c5a7a;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            color: white;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .telemetry-section, .legal-warning {
+            background: #0a0f1ccc;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #2a6f8f;
+        }
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .brand-card {
+            background: rgba(18, 25, 45, 0.8);
+            border-radius: 1.2rem;
+            border: 1px solid #2a3a55;
+            overflow: hidden;
+            transition: 0.2s;
+        }
+        .brand-card.hidden { display: none; }
+        .brand-header {
+            background: #0f1422;
+            padding: 0.7rem;
+            font-weight: bold;
+            font-size: 1rem;
+            border-bottom: 1px solid #2a3a55;
+        }
+        .brand-body { padding: 0.8rem; }
+        .btn-remote {
+            display: block;
+            width: 100%;
+            background: #1e2f46;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .btn-remote:hover { background: #2c4a6e; }
+        .hardware-guide {
+            background: #0a0f1a;
+            border-radius: 1rem;
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            text-align: center;
+            cursor: pointer;
+            border: 1px dashed #3a5a7a;
+        }
+        .hardware-details {
+            display: none;
+            background: #000000aa;
+            padding: 0.5rem;
+            border-radius: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.65rem;
+        }
+        .universal-recovery {
+            background: #0b1422cc;
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            margin: 2rem 0;
+        }
+        .footer { text-align: center; font-size: 0.7rem; margin-top: 2rem; opacity: 0.7; }
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .spy-header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- PASSWORD OVERLAY -->
+<div id="passwordOverlay">
+    <div class="password-box">
+        <h2>🔐 SPY NET TERMINAL</h2>
+        <p>Enter authorization key</p>
+        <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
+        <button id="unlockButton">Unlock System</button>
+        <div id="errorMsg" class="error-msg"></div>
+    </div>
+</div>
+
+<!-- MAIN HUB (hidden initially) -->
+<div id="mainHub">
+    <div class="spy-header">
+        <h1>🕸️ SPY NET</h1>
+        <p>• KENYA EDITION • EMAIL RECOVERY + RESET HUB • LEGAL •</p>
+    </div>
+
+    <!-- NEW: EMAIL RECOVERY GUIDE SECTION -->
+    <div class="guide-section">
+        <h3>📧 FORGOT THE EMAIL ADDRESS ON YOUR LOCKED PHONE?</h3>
+        <p>Follow these legal steps to recover your email without hacking. Click each step for more help.</p>
+        <ol class="step-list">
+            <li><strong>Step 1: Try to remember using clues</strong> – Ask yourself: Which email do I use for Google Play? YouTube? Any other device signed in?</li>
+            <li><strong>Step 2: Use Google's "Forgot email?" recovery tool</strong> – Go to <a href="https://accounts.google.com/signin/usernamerecovery" target="_blank" style="color:#00ffcc;">Google Account Recovery</a> and enter a recovery phone number or alternate email.</li>
+            <li><strong>Step 3: Try Samsung's "Find ID" if it's a Samsung phone</strong> – Visit <a href="https://findmymobile.samsung.com/" target="_blank" style="color:#00ffcc;">Samsung Find My Mobile</a> and click "Forgot your ID?"</li>
+            <li><strong>Step 4: Check with your mobile carrier</strong> – Safaricom, Airtel, Telkom may have records of the email used to set up the phone (requires identity verification).</li>
+            <li><strong>Step 5: Use the "Find My Device" test</strong> – On a PC, try logging into <a href="https://www.google.com/android/find" target="_blank" style="color:#00ffcc;">Find My Device</a> with each email guess. If the phone appears, you've found the right email.</li>
+            <li><strong>Step 6: Last resort – Factory reset (erases all data)</strong> – If no email can be recovered, use the hardware reset guide below to wipe the phone and set it up fresh.</li>
+        </ol>
+        <button id="expandEmailTips" class="btn-guide">🔍 Show advanced email recovery tips</button>
+        <div id="emailTipsDetail" style="display: none; margin-top: 0.8rem; background: #00000066; padding: 0.8rem; border-radius: 1rem; font-size: 0.8rem;">
+            <strong>💡 Extra tips:</strong><br/>
+            • Check your browser's saved passwords on your PC (Chrome/Edge: Settings → Passwords) – often the email is visible.<br/>
+            • Look at old receipts from Google Play or app purchases – they contain the email address.<br/>
+            • If you have a tablet or another phone logged into the same Google account, go to Settings → Google → see the email at the top.<br/>
+            • Ask a family member if they ever received an email from you – the "From" address is your email.<br/>
+            • Contact Google Support with the phone's IMEI number (on the box or under battery) – they may help if you prove ownership.
+        </div>
+    </div>
+
+    <div class="telemetry-section">
+        <h3>📡 CAPABILITIES</h3>
+        <ol>
+            <li>Recover forgotten email via official tools (links provided).</li>
+            <li>Open remote reset portals for any brand (Samsung, Xiaomi, Tecno, Infinix, Apple, etc.).</li>
+            <li>Show hardware button combinations for recovery mode – all brands covered.</li>
+            <li>Guide you through factory reset (remote or physical).</li>
+            <li>Legally wipe forgotten pattern/PIN from your own device.</li>
+            <li>Universal hardware reset instructions that work on any phone.</li>
+            <li>Includes every brand listed – from popular to legacy.</li>
+        </ol>
+    </div>
+
+    <div class="legal-warning">
+        ⚠️ This tool provides official manufacturer portals & hardware guides. You must own the device or have explicit permission. Remote reset requires phone online and account linked. Data will be erased.
+    </div>
+
+    <!-- SEARCH BOX -->
+    <div class="search-container">
+        <input type="text" id="brandSearch" placeholder="🔍 Search brand (e.g., Samsung, Tecno, Infinix...)" autocomplete="off">
+    </div>
+
+    <div id="brandGrid" class="brand-grid"></div>
+
+    <div class="universal-recovery">
+        <h3>🛠️ UNIVERSAL HARDWARE RESET (ANY ANDROID)</h3>
+        <ol>
+            <li>Power off the phone.</li>
+            <li>Press <strong>Volume Up + Power</strong> (or Volume Down + Power) until recovery appears.</li>
+            <li>Navigate to <strong>"Wipe data/factory reset"</strong> → press Power to select.</li>
+            <li>Confirm → reboot. <span style="color:#ffaa66;">ALL DATA ERASED, pattern removed.</span></li>
+        </ol>
+    </div>
+    <div class="footer">
+        SPY NET • KENYA EDITION • LEGAL USE ONLY • Remote reset requires phone online & account credentials.
+    </div>
+</div>
+
+<script>
+    // ---------- BRAND LIST (same as provided) ----------
+    const brands = [
+        "Samsung", "Apple", "Xiaomi", "Tecno", "Infinix", "iTel", "Oppo", "Vivo", "Huawei", "Realme",
+        "OnePlus", "Honor", "Google", "Motorola", "Nokia", "Sony", "Asus", "ZTE", "Lenovo", "HTC",
+        "Gionee", "Alcatel", "Hisense", "Meizu", "Coolpad", "Doogee", "Ulefone", "Blackview", "Oukitel", "Umidigi",
+        "Sharp", "Panasonic", "Philips", "TCL", "Blu", "Cat Phones", "Fairphone", "Nothing", "Wiko", "BQ",
+        "BlackBerry", "Palm", "Siemens Mobile", "Ericsson", "Kyocera", "Fujitsu", "LeEco", "YotaPhone", "Vertu", "Energizer Mobile"
+    ];
+
+    function getRemoteUrl(brand) {
+        let b = brand.toLowerCase();
+        if (b.includes("samsung")) return "https://findmymobile.samsung.com/";
+        if (b.includes("xiaomi") || b.includes("poco")) return "https://i.mi.com/find/";
+        if (b.includes("huawei") || b.includes("honor")) return "https://cloud.huawei.com/findphone/";
+        if (b.includes("oppo") || b.includes("oneplus") || b.includes("realme")) return "https://cloud.oppo.com/find/";
+        if (b.includes("apple") || b.includes("iphone")) return "https://www.icloud.com/find";
+        if (b.includes("google") || b.includes("pixel")) return "https://www.google.com/android/find";
+        return "https://www.google.com/android/find";
+    }
+
+    function getHardwareCombo(brand) {
+        let b = brand.toLowerCase();
+        if (b.includes("samsung")) return "Samsung: Power off → Volume Up + Power → Recovery → Wipe data/factory reset.";
+        if (b.includes("xiaomi") || b.includes("poco")) return "Xiaomi/Poco: Power off → Volume Up + Power → Recovery → Wipe data.";
+        if (b.includes("huawei") || b.includes("honor")) return "Huawei/Honor: Power off → Volume Up + Power → eRecovery → Wipe data.";
+        if (b.includes("oneplus") || b.includes("oppo") || b.includes("realme")) return "OnePlus/Oppo/Realme: Power off → Volume Down + Power → Recovery → Format data.";
+        if (b.includes("google") || b.includes("pixel")) return "Google Pixel: Power off → Volume Down + Power → Recovery → Wipe data.";
+        if (b.includes("apple") || b.includes("iphone")) return "iPhone: Connect to PC with iTunes/Finder → Recovery mode → Restore (wipes device).";
+        if (b.includes("tecno") || b.includes("infinix") || b.includes("itel")) return "Tecno/Infinix/iTel: Power off → Volume Up + Power → Recovery → Wipe data/factory reset.";
+        return "Generic: Power off → Volume Up + Power (or Volume Down) → Recovery → 'Wipe data/factory reset'.";
+    }
+
+    function buildBrandGrid() {
+        const grid = document.getElementById('brandGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        for (let brand of brands) {
+            const safeId = brand.replace(/[^a-zA-Z0-9]/g, '');
+            const card = document.createElement('div');
+            card.className = 'brand-card';
+            card.setAttribute('data-brand-name', brand.toLowerCase());
+            card.innerHTML = `
+                <div class="brand-header">📱 ${brand}</div>
+                <div class="brand-body">
+                    <button class="btn-remote" data-url="${getRemoteUrl(brand)}">🌐 REMOTE RESET</button>
+                    <div class="hardware-guide" data-detail="${safeId}">🔧 HARDWARE MODE</div>
+                    <div class="hardware-details" id="detail-${safeId}">${getHardwareCombo(brand)}</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+        attachEvents();
+    }
+
+    function attachEvents() {
+        document.querySelectorAll('.btn-remote').forEach(btn => {
+            btn.removeEventListener('click', remoteHandler);
+            btn.addEventListener('click', remoteHandler);
+        });
+        document.querySelectorAll('.hardware-guide').forEach(guide => {
+            const detailId = guide.getAttribute('data-detail');
+            const detailDiv = document.getElementById(`detail-${detailId}`);
+            if (detailDiv) detailDiv.style.display = 'none';
+            guide.removeEventListener('click', hardwareToggle);
+            guide.addEventListener('click', hardwareToggle);
+        });
+    }
+
+    function remoteHandler(e) {
+        const url = e.currentTarget.getAttribute('data-url');
+        if (url) window.open(url, '_blank');
+    }
+
+    function hardwareToggle(e) {
+        const guide = e.currentTarget;
+        const detailId = guide.getAttribute('data-detail');
+        const detailDiv = document.getElementById(`detail-${detailId}`);
+        if (detailDiv) {
+            if (detailDiv.style.display === 'none') {
+                detailDiv.style.display = 'block';
+            } else {
+                detailDiv.style.display = 'none';
+            }
+        }
+    }
+
+    // Search filter
+    function setupSearch() {
+        const searchInput = document.getElementById('brandSearch');
+        if (!searchInput) return;
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.brand-card');
+            cards.forEach(card => {
+                const brandName = card.getAttribute('data-brand-name') || '';
+                if (brandName.includes(query) || query === '') {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        });
+    }
+
+    // Email tips toggle
+    function setupEmailTips() {
+        const btn = document.getElementById('expandEmailTips');
+        const tipsDiv = document.getElementById('emailTipsDetail');
+        if (btn && tipsDiv) {
+            btn.addEventListener('click', () => {
+                if (tipsDiv.style.display === 'none') {
+                    tipsDiv.style.display = 'block';
+                    btn.textContent = '🔽 Hide advanced tips';
+                } else {
+                    tipsDiv.style.display = 'none';
+                    btn.textContent = '🔍 Show advanced email recovery tips';
+                }
+            });
+        }
+    }
+
+    // Password unlock
+    const overlay = document.getElementById('passwordOverlay');
+    const mainHub = document.getElementById('mainHub');
+    const unlockBtn = document.getElementById('unlockButton');
+    const passInput = document.getElementById('passwordInput');
+    const errorSpan = document.getElementById('errorMsg');
+    const CORRECT_PASS = "skpynet@26";
+
+    function unlock() {
+        if (passInput.value === CORRECT_PASS) {
+            overlay.style.display = 'none';
+            mainHub.style.display = 'block';
+            buildBrandGrid();
+            setupSearch();
+            setupEmailTips();
+        } else {
+            errorSpan.innerText = '❌ Invalid password. Access denied.';
+            passInput.value = '';
+        }
+    }
+
+    unlockBtn.addEventListener('click', unlock);
+    passInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') unlock();
+    });
+</script>
+</body>
+</html>
