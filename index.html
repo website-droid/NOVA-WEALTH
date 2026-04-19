@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SPY NET • All Brands • Ultimate Reset Hub</title>
+    <!-- GSAP & Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        #webgl-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; display: block; }
+        body { font-family: 'Inter', system-ui, 'Segoe UI', monospace; color: #eef4ff; min-height: 100vh; background: transparent; }
+        .content-overlay { position: relative; z-index: 10; padding: 2rem 1.5rem; backdrop-filter: blur(3px); }
+        .password-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3,6,12,0.95); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 1000; transition: 0.3s; }
+        .password-box { background: rgba(15,23,42,0.9); border-radius: 2rem; padding: 2rem; width: 90%; max-width: 380px; text-align: center; border: 1px solid #00ffccaa; box-shadow: 0 20px 35px #000000aa; transform: scale(0.9); opacity: 0; animation: fadeInScale 0.5s forwards; }
+        @keyframes fadeInScale { to { transform: scale(1); opacity: 1; } }
+        .password-box h2 { margin-bottom: 1rem; color: #00ffcc; }
+        .password-box input { width: 100%; padding: 0.8rem; border-radius: 2rem; border: none; background: #1e2a3a; color: white; font-size: 1rem; text-align: center; margin: 1rem 0; }
+        .password-box button { background: #2c7da0; border: none; padding: 0.7rem 1.5rem; border-radius: 2rem; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
+        .password-box button:hover { background: #00aacc; transform: scale(1.02); }
+        .error-msg { color: #ff8888; font-size: 0.8rem; margin-top: 0.5rem; }
+        .cyber-container { max-width: 1600px; margin: 0 auto; display: none; opacity: 0; }
+        .spy-header { text-align: center; margin-bottom: 2.5rem; border-bottom: 2px solid #00ffcc66; padding-bottom: 1.2rem; }
+        .spy-header h1 { font-size: 3rem; font-weight: 800; letter-spacing: 4px; background: linear-gradient(135deg, #00ffcc, #2a7faa, #00ccff); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: 0 0 10px #00ffcc33; }
+        .legal-warning { background: #1e1a2fcc; backdrop-filter: blur(10px); border-left: 5px solid #ffaa33; border-radius: 1.2rem; padding: 1rem 1.8rem; margin-bottom: 2rem; }
+        .telemetry-section { background: #0a0f1ccc; border-radius: 1.5rem; padding: 1.2rem 1.8rem; margin-bottom: 2rem; border: 1px solid #2a6f8f; }
+        .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; margin: 2rem 0; }
+        .brand-card { background: rgba(18, 25, 45, 0.7); backdrop-filter: blur(4px); border-radius: 1.5rem; border: 1px solid #2a3a55; transition: 0.3s; }
+        .brand-card:hover { border-color: #00ffccaa; transform: translateY(-5px); }
+        .brand-header { background: #0f1422; padding: 0.8rem 1rem; font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2a3a55; }
+        .brand-body { padding: 1rem; }
+        .btn-remote { display: block; width: 100%; background: #1e2f46; border: none; padding: 0.6rem; border-radius: 2rem; color: white; font-weight: 600; margin: 0.6rem 0; cursor: pointer; text-align: center; font-size: 0.8rem; transition: 0.2s; }
+        .btn-remote:hover { background: #2c4a6e; transform: scale(1.02); }
+        .hardware-guide { background: #0a0f1a; border-radius: 1rem; padding: 0.5rem; margin-top: 0.6rem; font-size: 0.7rem; text-align: center; cursor: pointer; border: 1px dashed #3a5a7a; transition: 0.2s; }
+        .hardware-details { display: none; background: #000000aa; padding: 0.6rem; border-radius: 0.8rem; margin-top: 0.5rem; font-size: 0.65rem; }
+        .universal-recovery { background: #0b1422cc; border-radius: 1.5rem; padding: 1.5rem; margin: 2rem 0; border: 1px solid #2a6f8f; }
+        .footer { text-align: center; font-size: 0.7rem; margin-top: 2rem; opacity: 0.8; }
+        @media (max-width: 700px) { .spy-header h1 { font-size: 2rem; } .brand-header { font-size: 1rem; } }
+    </style>
+</head>
+<body>
+    <canvas id="webgl-bg"></canvas>
+    <div class="content-overlay">
+        <div id="passwordOverlay" class="password-overlay">
+            <div class="password-box">
+                <h2>🔐 SPY NET TERMINAL</h2>
+                <p>Enter authorization key</p>
+                <input type="password" id="accessPassword" placeholder="Password" autocomplete="off">
+                <button id="unlockBtn">Unlock System</button>
+                <div id="passError" class="error-msg"></div>
+            </div>
+        </div>
+
+        <div id="mainHub" class="cyber-container">
+            <div class="spy-header">
+                <h1>🕸️ SPY NET</h1>
+                <p>• EVERY PHONE BRAND ON EARTH • LEGAL RESET HUB •</p>
+            </div>
+
+            <div class="telemetry-section">
+                <h3>📡 TELEMETRY & OPERATIONAL CAPABILITIES</h3>
+                <ol>
+                    <li>🔗 <strong>Open official remote reset portals</strong> for any brand (Google, Samsung, Xiaomi, Huawei, Oppo/OnePlus, Apple, and generic Android via Google Find My Device).</li>
+                    <li>📱 <strong>Provide brand‑specific hardware button combinations</strong> for recovery mode – covering all manufacturers worldwide.</li>
+                    <li>🔄 <strong>Guide you through a complete factory reset</strong> using remote account‑based erasure or physical button recovery.</li>
+                    <li>⚠️ <strong>Legally wipe forgotten pattern/PIN</strong> from any device (prerequisites: account linked for remote, or physical access for hardware reset).</li>
+                    <li>🧭 <strong>Universal hardware reset instructions</strong> that work on any smartphone, even obscure brands.</li>
+                    <li>📋 <strong>Interactive toggle for detailed recovery steps</strong> – no external search needed.</li>
+                    <li>⚡ <strong>Includes every phone brand in the world</strong> – from Acer to ZTE, including regional brands like Infinix, Tecno, Itel, Lava, Micromax, Cherry Mobile, and more.</li>
+                    <li>🛡️ <strong>Zero hacking or brute‑forcing</strong> – 100% legal, uses only manufacturer‑approved channels.</li>
+                </ol>
+                <p style="margin-top: 0.8rem; font-size:0.8rem;">✅ <strong>Prerequisites for remote reset:</strong> Phone must be online, have Find My Device / respective cloud service enabled, and you must know the account password.</p>
+            </div>
+
+            <div class="legal-warning">
+                ⚡ <strong>TERMINAL DIRECTIVE:</strong> This tool provides <strong>official manufacturer portals & hardware reset guides</strong>. No code can directly break phone encryption. 
+                You <strong>must</strong> have the phone linked to a Google/Samsung/Xiaomi/etc. account (for remote reset) OR physical access for hardware reset. 
+                Remote reset wipes all data. Use legally on your own device only.
+            </div>
+
+            <!-- BRAND GRID: COMPLETE LIST OF ALL PHONE BRANDS IN THE WORLD -->
+            <div class="brand-grid" id="brandGrid"></div>
+
+            <div class="universal-recovery">
+                <h3>🛠️ UNIVERSAL HARDWARE RESET (ANY ANDROID)</h3>
+                <p>If remote reset impossible, use physical buttons:</p>
+                <ol style="margin-left: 1.5rem; margin-top: 0.8rem;">
+                    <li>Power off the phone.</li>
+                    <li>Press <strong>Volume Up + Power</strong> (or Volume Down + Power) until recovery appears.</li>
+                    <li>Navigate to <strong>"Wipe data/factory reset"</strong> → select with Power button.</li>
+                    <li>Confirm → reboot. <span style="color:#ffaa66;">⚠️ ALL DATA ERASED, pattern removed.</span></li>
+                </ol>
+            </div>
+            <div class="footer">
+                <p>🕸️ SPY NET • PASSWORD PROTECTED • LEGAL USE ONLY • Remote reset requires phone online & account linked.</p>
+                <p>📱 Every brand covered: Acer, Alcatel, Asus, BlackBerry, Cat, Coolpad, Cubot, Doogee, Elephone, Fairphone, Gionee, Google, Honor, Huawei, Infinix, Itel, Kyocera, Lava, LeEco, Lenovo, LG, Meizu, Micromax, Motorola, Nokia, Nothing, OnePlus, Oppo, Realme, Samsung, Sharp, Sony, TCL, Tecno, Ulefone, Umidigi, Vivo, Xiaomi, ZTE, and 50+ more.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WEBGL PARTICLE BACKGROUND (same as before)
+        const canvas = document.getElementById('webgl-bg');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x03060c, 1);
+        
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1800;
+        const posArray = new Float32Array(particlesCount * 3);
+        for(let i = 0; i < particlesCount * 3; i += 3) {
+            posArray[i] = (Math.random() - 0.5) * 40;
+            posArray[i+1] = (Math.random() - 0.5) * 25;
+            posArray[i+2] = (Math.random() - 0.5) * 25 - 10;
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.07, color: 0x00aaff, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 1000;
+        const starPos = new Float32Array(starCount * 3);
+        for(let i = 0; i < starCount * 3; i += 3) {
+            starPos[i] = (Math.random() - 0.5) * 200;
+            starPos[i+1] = (Math.random() - 0.5) * 100;
+            starPos[i+2] = (Math.random() - 0.5) * 80 - 40;
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({ size: 0.04, color: 0x88aaff, transparent: true, opacity: 0.4 });
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+        
+        camera.position.z = 8;
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+        });
+        
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            particlesMesh.rotation.y += 0.0005;
+            particlesMesh.rotation.x += 0.0003;
+            stars.rotation.y -= 0.0002;
+            stars.rotation.x += 0.0001;
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 0.3 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        animateParticles();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // -------------------- BRAND DATABASE (ALL PHONE BRANDS) --------------------
+        const brands = [
+            "Acer", "Alcatel", "Allview", "Amazon (Fire Phone)", "Apple (iPhone)", "Archos", "Asus", "BlackBerry", "Blackview", "BQ", "Cat (Caterpillar)", "Cherry Mobile", "Coolpad", "Cubot", "Doogee", "Elephone", "Emporia", "Energizer", "Essential", "Fairphone", "Fossibot", "Freetel", "Fujitsu", "Gigaset", "Gionee", "Google (Pixel)", "Hannspree", "Haier", "Hisense", "Honor", "Hotwav", "HTC", "Huawei", "Infinix", "Itel", "Karbonn", "Kazam", "Kyocera", "Lava", "LeEco", "Lenovo", "LG", "Mafe", "Maxwest", "Meizu", "Micromax", "Microsoft (Lumia)", "Mobell", "MobiWire", "Motorola", "MyPhone (Philippines)", "NEC", "Nokia", "Nothing", "Nubia", "Oppo", "OnePlus", "Oukitel", "Panasonic", "Poco", "Prestigio", "QMobile", "Razer", "Realme", "Samsung", "Sharp", "Siemens", "Sony (Xperia)", "Spice", "TCL", "Tecno", "Tesla (Pi Phone)", "T-Mobile (Revvl)", "Tolino", "Ulefone", "Umidigi", "Unihertz", "Verykool", "Vertu", "Vestel", "Vivo", "Vodafone", "Wiko", "Wileyfox", "Xiaomi", "Xolo", "Yezz", "YU", "ZTE", "Zuum"
+        ];
+        
+        // Function to get remote reset URL based on brand
+        function getRemoteUrl(brand) {
+            const b = brand.toLowerCase();
+            if (b.includes("samsung")) return "https://findmymobile.samsung.com/";
+            if (b.includes("xiaomi") || b.includes("poco") || b.includes("redmi")) return "https://i.mi.com/find/";
+            if (b.includes("huawei") || b.includes("honor")) return "https://cloud.huawei.com/findphone/";
+            if (b.includes("oppo") || b.includes("oneplus") || b.includes("realme")) return "https://cloud.oppo.com/find/";
+            if (b.includes("apple") || b.includes("iphone")) return "https://www.icloud.com/find";
+            if (b.includes("google") || b.includes("pixel")) return "https://www.google.com/android/find";
+            if (b.includes("nokia")) return "https://www.google.com/android/find";
+            if (b.includes("motorola") || b.includes("moto")) return "https://www.google.com/android/find";
+            if (b.includes("lg")) return "https://www.google.com/android/find";
+            if (b.includes("sony")) return "https://www.google.com/android/find";
+            if (b.includes("htc")) return "https://www.google.com/android/find";
+            if (b.includes("asus")) return "https://www.google.com/android/find";
+            if (b.includes("lenovo")) return "https://www.google.com/android/find";
+            if (b.includes("zte")) return "https://www.google.com/android/find";
+            if (b.includes("infinix") || b.includes("tecno") || b.includes("itel")) return "https://www.google.com/android/find";
+            return "https://www.google.com/android/find"; // default for any Android
+        }
+        
+        // Hardware combo description
+        function getHardwareCombo(brand) {
+            const b = brand.toLowerCase();
+            if (b.includes("samsung")) return "Samsung: Power off → Volume Up + Power (or Bixby + Vol Up) → Recovery → Wipe data.";
+            if (b.includes("xiaomi") || b.includes("poco") || b.includes("redmi")) return "Xiaomi/Poco: Power off → Volume Up + Power → Recovery → Wipe data.";
+            if (b.includes("huawei") || b.includes("honor")) return "Huawei/Honor: Power off → Volume Up + Power → eRecovery → Wipe data/factory reset.";
+            if (b.includes("oneplus") || b.includes("oppo") || b.includes("realme")) return "OnePlus/Oppo/Realme: Power off → Volume Down + Power → Recovery → Format data.";
+            if (b.includes("google") || b.includes("pixel")) return "Google Pixel: Power off → Volume Down + Power → Recovery → Wipe data/factory reset.";
+            if (b.includes("nokia")) return "Nokia: Power off → Volume Up + Power → Recovery → Wipe data.";
+            if (b.includes("motorola") || b.includes("moto")) return "Motorola: Power off → Volume Down + Power → Recovery → Wipe data.";
+            if (b.includes("lg")) return "LG: Power off → Volume Down + Power → Release at logo → Recovery → Factory reset.";
+            if (b.includes("sony")) return "Sony Xperia: Power off → Volume Down + Power → Recovery → Wipe data.";
+            if (b.includes("htc")) return "HTC: Power off → Volume Down + Power → Recovery → Factory reset.";
+            if (b.includes("asus")) return "Asus: Power off → Volume Down + Power → Recovery → Wipe data.";
+            if (b.includes("lenovo")) return "Lenovo: Power off → Volume Up + Power → Recovery → Wipe data.";
+            if (b.includes("zte")) return "ZTE: Power off → Volume Up + Power → Recovery → Factory reset.";
+            if (b.includes("apple") || b.includes("iphone")) return "iPhone: Use PC with iTunes/Finder → Recovery mode (Vol Up, Vol Down, hold Power) → Restore (wipes device).";
+            return "Generic: Power off → Volume Up + Power (or Volume Down) → Recovery → 'Wipe data/factory reset'.";
+        }
+        
+        // Generate brand cards dynamically
+        function buildBrandGrid() {
+            const grid = document.getElementById('brandGrid');
+            grid.innerHTML = '';
+            brands.forEach(brand => {
+                const card = document.createElement('div');
+                card.className = 'brand-card';
+                const brandId = brand.replace(/[^a-zA-Z0-9]/g, '');
+                card.innerHTML = `
+                    <div class="brand-header">📱 ${brand}</div>
+                    <div class="brand-body">
+                        <button class="btn-remote" data-url="${getRemoteUrl(brand)}">🌐 REMOTE RESET</button>
+                        <div class="hardware-guide" data-brand="${brandId}">🔧 HARDWARE MODE</div>
+                        <div class="hardware-details" id="details-${brandId}">${getHardwareCombo(brand)}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            // Re-attach event listeners after grid built
+            attachRemoteAndHardwareEvents();
+        }
+        
+        // Global functions for events
+        function attachRemoteAndHardwareEvents() {
+            const remoteBtns = document.querySelectorAll('.btn-remote');
+            remoteBtns.forEach(btn => {
+                btn.removeEventListener('click', remoteHandler);
+                btn.addEventListener('click', remoteHandler);
+            });
+            const hardwareGuides = document.querySelectorAll('.hardware-guide');
+            hardwareGuides.forEach(guide => {
+                const brandAttr = guide.getAttribute('data-brand');
+                const detailsDiv = document.getElementById(`details-${brandAttr}`);
+                if (detailsDiv) detailsDiv.style.display = 'none';
+                guide.removeEventListener('click', hardwareToggle);
+                guide.addEventListener('click', function() {
+                    if (detailsDiv.style.display === 'none') {
+                        gsap.to(detailsDiv, { duration: 0.2, autoAlpha: 1, display: 'block' });
+                    } else {
+                        gsap.to(detailsDiv, { duration: 0.2, autoAlpha: 0, display: 'none' });
+                    }
+                });
+            });
+        }
+        
+        function remoteHandler(e) {
+            const url = e.currentTarget.getAttribute('data-url');
+            if (url) window.open(url, '_blank');
+            else alert('Official portal URL missing.');
+        }
+        
+        // PASSWORD UNLOCK + GSAP
+        const overlay = document.getElementById('passwordOverlay');
+        const mainHub = document.getElementById('mainHub');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const passInput = document.getElementById('accessPassword');
+        const errorSpan = document.getElementById('passError');
+        const CORRECT_PASS = "skpynet@26";
+        
+        function unlockSystem() {
+            if (passInput.value === CORRECT_PASS) {
+                gsap.to(overlay, {
+                    duration: 0.8,
+                    opacity: 0,
+                    scale: 0.9,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        overlay.style.display = 'none';
+                        mainHub.style.display = 'block';
+                        buildBrandGrid(); // build all brand cards after unlock
+                        gsap.fromTo(mainHub, { opacity: 0, y: 30 }, { duration: 0.9, opacity: 1, y: 0, ease: "back.out(0.5)" });
+                        gsap.fromTo('.brand-card', { opacity: 0, y: 40 }, { duration: 0.5, opacity: 1, y: 0, stagger: 0.02, ease: "power2.out" });
+                        gsap.fromTo('.telemetry-section', { opacity: 0, x: -20 }, { duration: 0.7, opacity: 1, x: 0 });
+                    }
+                });
+            } else {
+                errorSpan.innerText = '❌ Invalid password. Access denied.';
+                passInput.value = '';
+                gsap.to('.password-box', { duration: 0.1, x: 5, repeat: 3, yoyo: true, ease: "none" });
+            }
+        }
+        
+        unlockBtn.addEventListener('click', unlockSystem);
+        passInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') unlockSystem(); });
+        
+        // In case hub becomes visible by any other means
+        const observer = new MutationObserver(() => {
+            if (mainHub.style.display === 'block' && document.querySelectorAll('.brand-card').length === 0) {
+                buildBrandGrid();
+            }
+        });
+        observer.observe(mainHub, { attributes: true, attributeFilter: ['style'] });
+    </script>
+</body>
+  </html>
