@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>MultiStyle Mart | Portfolio & Application</title>
+  <!-- Google Fonts & simple reset -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #faf8f5;
+      color: #1e1e2a;
+      scroll-behavior: smooth;
+    }
+
+    /* container utility */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* header / hero */
+    .hero {
+      background: linear-gradient(135deg, #1f2b2c 0%, #2a3b3c 100%);
+      color: white;
+      padding: 60px 0 70px;
+      border-bottom-left-radius: 32px;
+      border-bottom-right-radius: 32px;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .hero-text h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .hero-text p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 550px;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+
+    .badge {
+      background: rgba(255,255,240,0.2);
+      backdrop-filter: blur(4px);
+      display: inline-block;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .hero-stats {
+      background: #ffffff15;
+      backdrop-filter: blur(8px);
+      border-radius: 32px;
+      padding: 28px 32px;
+      text-align: center;
+      min-width: 220px;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+    }
+
+    /* product categories grid */
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 60px 0 32px 0;
+      position: relative;
+      display: inline-block;
+    }
+    .section-title:after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60%;
+      height: 3px;
+      background: #c2a475;
+      border-radius: 4px;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .cat-card {
+      background: white;
+      border-radius: 28px;
+      padding: 24px 12px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+      transition: all 0.25s ease;
+      border: 1px solid #edeae4;
+      cursor: default;
+    }
+    .cat-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+      border-color: #dcccae;
+    }
+    .cat-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+    }
+    .cat-card h3 {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .cat-card p {
+      font-size: 0.8rem;
+      color: #6b5e4e;
+    }
+
+    /* seller portfolio intro */
+    .seller-portfolio {
+      background: #fff7ef;
+      border-radius: 48px;
+      padding: 40px 32px;
+      margin: 40px 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 32px;
+      border: 1px solid #f0e2d0;
+    }
+    .seller-text h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .seller-text p {
+      color: #3d3529;
+      max-width: 500px;
+      margin-bottom: 16px;
+    }
+    .cta-small {
+      background: #c2a475;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+    .cta-small:hover {
+      background: #a58354;
+    }
+
+    /* application form section */
+    .form-section {
+      background: white;
+      border-radius: 48px;
+      padding: 48px 40px;
+      margin: 48px 0 70px;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.05);
+      border: 1px solid #ede6dc;
+    }
+    .form-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .form-header h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .form-header p {
+      color: #5c5243;
+      margin-top: 8px;
+    }
+    .contact-form {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .form-row .input-group {
+      flex: 1;
+      min-width: 180px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .input-group label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+      color: #2f2a24;
+    }
+    input, select, textarea {
+      padding: 14px 16px;
+      border-radius: 28px;
+      border: 1px solid #e2d9cf;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      background: #fefcf9;
+      transition: 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #c2a475;
+      box-shadow: 0 0 0 3px rgba(194,164,117,0.2);
+    }
+    textarea {
+      border-radius: 24px;
+      resize: vertical;
+    }
+    .btn-submit {
+      background: #1f2b2c;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 8px;
+    }
+    .btn-submit:hover {
+      background: #c2a475;
+      transform: scale(0.98);
+    }
+    .status-msg {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: 500;
+      padding: 12px;
+      border-radius: 50px;
+    }
+    .status-success {
+      background: #e0f2e9;
+      color: #1f6e43;
+    }
+    .status-error {
+      background: #ffe6e5;
+      color: #bc4e2c;
+    }
+    footer {
+      text-align: center;
+      padding: 36px 20px;
+      border-top: 1px solid #ede3d6;
+      color: #5f5546;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 700px) {
+      .hero-content { flex-direction: column; text-align: center; }
+      .hero-text p { margin-left: auto; margin-right: auto; }
+      .form-section { padding: 32px 20px; }
+      .section-title { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container hero-content">
+    <div class="hero-text">
+      <span class="badge">📦 Trusted since 2012</span>
+      <h1>MultiStyle <br>Merchant Portfolio</h1>
+      <p>Clothes • Mattresses • Shoes • Belts • Hats • T-shirts • Shirts • Trousers — premium quality & reliable bulk deals.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-number">500+</div>
+      <div>Happy Retailers</div>
+      <div style="margin-top: 10px;">⭐ 4.9 ★</div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <!-- categories showcase : see those things -->
+  <div>
+    <div class="section-title">📌 product universe</div>
+    <div class="categories-grid">
+      <div class="cat-card"><div class="cat-icon">👕</div><h3>T-Shirts</h3><p>cotton, oversized, prints</p></div>
+      <div class="cat-card"><div class="cat-icon">👔</div><h3>Shirts</h3><p>formal, casual, linen</p></div>
+      <div class="cat-card"><div class="cat-icon">👖</div><h3>Trousers</h3><p>chinos, joggers, formal</p></div>
+      <div class="cat-card"><div class="cat-icon">👟</div><h3>Shoes</h3><p>sneakers, leather, boots</p></div>
+      <div class="cat-card"><div class="cat-icon">🛏️</div><h3>Mattresses</h3><p>memory foam, spring, orthopedic</p></div>
+      <div class="cat-card"><div class="cat-icon">🧢</div><h3>Hats & Caps</h3><p>baseball, beanies, buckets</p></div>
+      <div class="cat-card"><div class="cat-icon">⛓️</div><h3>Belts</h3><p>leather, woven, casual</p></div>
+      <div class="cat-card"><div class="cat-icon">👕🧥</div><h3>Clothing Sets</h3><p>matching styles & bundles</p></div>
+    </div>
+  </div>
+
+  <!-- seller intro (the person who sells) -->
+  <div class="seller-portfolio">
+    <div class="seller-text">
+      <h2>✨ Meet your premium vendor</h2>
+      <p>Specialized in apparel, home essentials & accessories. Wholesale & retail — authentic sourcing, fast shipping, and competitive prices for mattresses, shoes, belts, hats, tees & trousers.</p>
+      <button class="cta-small" id="scrollToFormBtn">📋 Apply for partnership →</button>
+    </div>
+    <div style="background:#e9e0d3; border-radius: 32px; padding: 10px 24px;">
+      <p style="font-weight:600;">📦 Bulk orders ready</p>
+      <p>✓ 24/7 support <br>✓ Worldwide shipping</p>
+    </div>
+  </div>
+
+  <!-- application form: after submission -> direct email to kijanablessing@gmail.com -->
+  <div class="form-section" id="applicationForm">
+    <div class="form-header">
+      <h2>🚀 Apply for your custom website</h2>
+      <p>Tell us about your store needs — after submitting, we’ll receive your request instantly and start building your professional portfolio site.</p>
+      <p style="font-size:0.85rem; margin-top:6px;">🔔 All info goes directly to <strong>kijanablessing@gmail.com</strong></p>
+    </div>
+
+    <form id="sellerApplicationForm" class="contact-form">
+      <div class="form-row">
+        <div class="input-group">
+          <label>Full name *</label>
+          <input type="text" id="fullName" placeholder="e.g. James Kariuki" required>
+        </div>
+        <div class="input-group">
+          <label>Phone number</label>
+          <input type="tel" id="phone" placeholder="+254 7XX XXX XXX">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="input-group">
+          <label>Email address *</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+        <div class="input-group">
+          <label>Preferred product focus</label>
+          <select id="productFocus">
+            <option value="All categories">All categories (clothes, mattresses, shoes…)</option>
+            <option value="Clothing & T-shirts">Clothing & T-shirts / Shirts</option>
+            <option value="Mattresses & bedding">Mattresses & bedding</option>
+            <option value="Footwear & accessories">Footwear & accessories (shoes, belts, hats)</option>
+            <option value="Full inventory">Full inventory (trousers + everything)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Business / Store name (optional)</label>
+        <input type="text" id="businessName" placeholder="e.g. MultiStyle Emporium">
+      </div>
+
+      <div class="input-group">
+        <label>Tell us about your vision / requirements *</label>
+        <textarea rows="4" id="message" placeholder="I need a modern portfolio website to showcase clothes, mattresses, shoes, belts, hats, t-shirts, shirts, trousers... also include online inquiry & gallery..." required></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit">✉️ Send Application → Direct to Blessing Teacher</button>
+      <div id="formStatus" class="status-msg" style="display: none;"></div>
+    </form>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 MultiStyle Mart — Portfolio & Application Hub | Quality Mattresses, Apparel, Accessories</p>
+  <p style="margin-top: 8px;">📩 After application, we’ll focus fully on building your dream e-commerce/portfolio website.</p>
+</footer>
+
+<script>
+  // CORRECTED EMAIL: kijanablessing@gmail.com
+  const TARGET_EMAIL = "kijanablessing@gmail.com";
+  
+  const form = document.getElementById('sellerApplicationForm');
+  const statusDiv = document.getElementById('formStatus');
+
+  // Helper: show status message (auto hide after 6s)
+  function showStatus(message, isError = false) {
+    statusDiv.style.display = 'block';
+    statusDiv.textContent = message;
+    statusDiv.className = `status-msg ${isError ? 'status-error' : 'status-success'}`;
+    setTimeout(() => {
+      if (statusDiv) {
+        statusDiv.style.display = 'none';
+      }
+    }, 7000);
+  }
+
+  // Scroll to form function
+  const scrollBtn = document.getElementById('scrollToFormBtn');
+  if (scrollBtn) {
+    scrollBtn.addEventListener('click', () => {
+      document.getElementById('applicationForm').scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    // get values
+    const fullName = document.getElementById('fullName').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const productFocus = document.getElementById('productFocus').value;
+    const businessName = document.getElementById('businessName').value.trim();
+    const messageText = document.getElementById('message').value.trim();
+
+    // Basic validation
+    if (!fullName) {
+      showStatus('❌ Please enter your full name.', true);
+      return;
+    }
+    if (!email) {
+      showStatus('❌ Email address is required so we can contact you back.', true);
+      return;
+    }
+    if (!email.includes('@') || !email.includes('.')) {
+      showStatus('❌ Please enter a valid email address.', true);
+      return;
+    }
+    if (!messageText) {
+      showStatus('❌ Please describe your website requirements (products, design, etc).', true);
+      return;
+    }
+
+    // Build a detailed email body with all the form info
+    const subject = `New Portfolio Application from ${fullName}`;
+    const bodyLines = [
+      `🌟 New Seller Application / Website Request 🌟`,
+      ``,
+      `👤 Full Name: ${fullName}`,
+      `📧 Applicant Email: ${email}`,
+      `📞 Phone: ${phone || 'Not provided'}`,
+      `🏷️ Business Name: ${businessName || '—'}`,
+      `📦 Product Focus: ${productFocus}`,
+      ``,
+      `📝 Project Requirements / Vision:`,
+      `${messageText}`,
+      ``,
+      `--- Additional Context ---`,
+      `The seller sells: clothes, mattresses, shoes, belts, hats, t-shirts, shirts, trousers.`,
+      `He/She requires a professional portfolio website with application-to-email functionality.`,
+      `Please follow up to build the website.`,
+      ``,
+      `— Sent via MultiStyle Mart Application Form —`
+    ];
+    
+    const body = encodeURIComponent(bodyLines.join('\n'));
+    const mailtoLink = `mailto:${TARGET_EMAIL}?subject=${encodeURIComponent(subject)}&body=${body}`;
+    
+    // Open default email client (Gmail, Outlook, etc.)
+    window.location.href = mailtoLink;
+    
+    // Show success feedback and optionally reset the form
+    showStatus(`✅ Application prepared! Your email client will open. Just send the email to ${TARGET_EMAIL}. We'll focus on building your website right away.`, false);
+    
+    // Optional: reset form fields after short delay? only if user wants, but not necessary.
+    // We'll keep data but user might want to clear.
+    setTimeout(() => {
+      if (confirm("Application drafted in your email! Would you like to clear the form now?")) {
+        form.reset();
+      }
+    }, 800);
+  });
+</script>
+</body>
+  </html>
